@@ -17,6 +17,7 @@ Recover_Ret Recover_Think(GOBJ *cpu, GOBJ *hmn);
 
 static Vec2 Vec2_add(Vec2 a, Vec2 b) { return (Vec2){a.X+b.X, a.Y+b.Y}; }
 static Vec2 Vec2_sub(Vec2 a, Vec2 b) { return (Vec2){a.X-b.X, a.Y-b.Y}; }
+static float Vec2_Length(Vec2 v) { return sqrtf(v.X*v.X + v.Y*v.Y); }
 
 static GOBJ *recover_debug_gobjs[32] = { 0 };
 
@@ -127,7 +128,121 @@ bool Recover_CanDrift(GOBJ *cpu) {
     return false;
 }
 
-void Recover_ThinkFox(Recover_Data *rec_data, GOBJ *cpu, GOBJ *hmn) {
+// main tree:
+//  side b
+//   to ledge
+//   just above ledge
+//    shorten to ledge
+//    mid shorten
+//    full
+//   just above plat
+//    shorten to ledge
+//    edge cancel
+//    full
+//  upb
+//   to ledge
+//   straight
+//   to side plat
+//   to top plat
+//   to ground
+//   very high
+//    full drift to stage
+//    start drift to stage then to ledge
+//    drift to side platform land
+//    drift to side platform fall through
+//    drift in then to ledge
+//
+// pre:
+//  double jump
+//  shine stall
+//  fall
+//  fast fall
+
+typedef struct Platform {
+    float x_1;
+    float x_2;
+    float y;
+} Platform;
+
+// returns true if has a side platform
+int Recover_PlatformSide(Platform *plat, float direction) {
+    switch (Stage_GetExternalID()) {
+    case GRKINDEXT_PSTAD:
+        *plat = (Platform) {
+            .x_1 = -55.0 * direction,
+            .x_2 = -25.0 * direction,
+            .y = 25.0
+        };
+        return true;
+    case GRKINDEXT_BATTLE:
+        *plat = (Platform) {
+            .x_1 = -57.6 * direction,
+            .x_2 = -20.0 * direction,
+            .y = 27.2
+        };
+        return true;
+    case GRKINDEXT_STORY:
+        *plat = (Platform) {
+            .x_1 = -59.5 * direction,
+            .x_2 = -28.0 * direction,
+            .y = 23.45
+        };
+        return true;
+    case GRKINDEXT_OLDPU: // dreamland
+        *plat = (Platform) {
+            .x_1 = -61.393 * direction,
+            .x_2 = -31.725 * direction,
+            .y = 30.142
+        };
+        return true;
+    case GRKINDEXT_IZUMI:
+        // TODO: FOD
+        return false;
+    }
+
+    return false;
+}
+
+int Recover_PlatformTop(Platform *plat) {
+    switch (Stage_GetExternalID()) {
+    case GRKINDEXT_BATTLE:
+        *plat = (Platform) {
+            .x_1 = -18.8,
+            .x_2 = 18.8,
+            .y = 54.5
+        };
+        return true;
+    case GRKINDEXT_STORY:
+        *plat = (Platform) {
+            .x_1 = -15.75,
+            .x_2 = 15.75,
+            .y = 42.0
+        };
+        return true;
+    case GRKINDEXT_OLDPU: // dreamland
+        *plat = (Platform) {
+            .x_1 = -19.018,
+            .x_2 = 19.018,
+            .y = 51.425,
+        };
+        return true;
+    case GRKINDEXT_IZUMI:
+        *plat = (Platform) {
+            .x_1 = -14.25,
+            .x_2 = 14.25,
+            .y = 42.75
+        };
+        return true;
+    }
+
+    return false;
+}
+
+int InFirefoxDeadzone(s8 x, s8 y) {
+    return (-23 < x && x < 23) || (-23 < y && y < 23);
+}
+
+void Recover_ThinkFox(const Recover_Data * const rec_data, GOBJ *cpu, GOBJ *hmn) {
     FighterData *cpu_data = cpu->userdata;
     FighterData *hmn_data = hmn->userdata;
 
@@ -145,18 +260,20 @@ void Recover_ThinkFox(Recover_Data *rec_data, GOBJ *cpu, GOBJ *hmn) {
     Vec2 ledge_grab_point = Vec2_add(rec_data->ledge, ledge_grab_offset);
     Recover_DebugPointSet(0, ledge_grab_point, 1);
     Vec2 vec_to_ledge_grab = Vec2_sub(ledge_grab_point, pos);
+    float dist_to_ledge = Vec2_Length(vec_to_ledge_grab);
 
-    float dist_to_ledge = sqrtf(
-          vec_to_ledge_grab.X * vec_to_ledge_grab.X 
-        + vec_to_ledge_grab.Y * vec_to_ledge_grab.Y
-    );
+    Vec2 vec_to_stage = {
+        .X = rec_data->ledge.X + 5.0 * rec_data->direction - pos.X,
+        .Y = 1.0 - pos.Y,
+    };
+    float dist_to_stage = Vec2_Length(vec_to_stage);
 
     bool double_jump_rising = (state == ASID_JUMPAERIALF || state == ASID_JUMPAERIALB) && cpu_data->phys.self_vel.Y > 0.0;
 
     // Because the cpu is often set to double jump out of hitstun, 
     // we hardcode it to not upb immediately because we want the counter-action to "complete".
-    if (Recover_IsAirActionable(cpu) && !double_jump_rising) {
-        if (dist_to_ledge < FOX_UPB_DISTANCE && rec_data->direction != 0) {
+    if (Recover_IsAirActionable(cpu) && !double_jump_rising && rec_data->direction != 0) {
+        if (dist_to_ledge < FOX_UPB_DISTANCE) {
             cpu_data->cpu.held |= HSD_BUTTON_B;
             cpu_data->cpu.lstickY = 127;
             return;
@@ -169,12 +286,106 @@ void Recover_ThinkFox(Recover_Data *rec_data, GOBJ *cpu, GOBJ *hmn) {
         }
 
         cpu_data->cpu.lstickX = 127 * rec_data->direction;
-    } else if (Recover_CanDrift(cpu)) {
-        cpu_data->cpu.lstickX = 127 * rec_data->direction;
+        return;
+    } 
+
+    if (Recover_CanDrift(cpu)) { // special fall / in aerial / past ledge
+        if (vec_to_ledge_grab.Y > 0.0) {
+            cpu_data->cpu.lstickY = -127;
+            return;
+        }
+
+        int in_fastfall = cpu_data->flags.is_fastfall;
+        float drift_speed = cpu_data->attr.aerial_drift_max;
+        float fall_speed = in_fastfall ? cpu_data->attr.fastfall_velocity : cpu_data->attr.terminal_velocity;
+        float fall_slope = drift_speed / fall_speed;
+
+        float ledge_slope = fabs(vec_to_ledge_grab.Y) / fabs(vec_to_ledge_grab.X);
+        float stage_slope = fabs(vec_to_stage.Y) / fabs(vec_to_stage.X);
+        int can_fall_to_ledge = ledge_slope > fall_slope;
+        int can_fall_to_stage = stage_slope > fall_slope;
+
+        // if ambiguous if cpu can drift to ledge. then hold in regardless
+        if (!can_fall_to_stage && vec_to_ledge_grab.X * rec_data->direction < 0.0) {
+            cpu_data->cpu.lstickX = 127 * rec_data->direction;
+        // if can drift to ledge
+        } else if (can_fall_to_ledge && vec_to_ledge_grab.X * rec_data->direction < 0.0) {
+            if (!in_fastfall && pos.Y > 0.0 && HSD_Randi(15) == 0) {
+                cpu_data->cpu.lstickY = -127; // fastfall
+            } else {
+                cpu_data->cpu.lstickX = -127 * rec_data->direction;
+            }
+        } else {
+            if (!in_fastfall && pos.Y > 0.0) {
+                cpu_data->cpu.lstickY = -127;
+            } else {
+                // hold away from hmn
+                float direction_to_hmn = pos.X < hmn_data->phys.pos.X ? 1.0 : -1.0;
+                cpu_data->cpu.lstickX = 127 * direction_to_hmn;
+            }
+        }
     } else if (state == 354 && frame >= 41) {
-        // pick firefox angle
-        cpu_data->cpu.lstickX = (s8)(vec_to_ledge_grab.X * 127.0 / dist_to_ledge);
-        cpu_data->cpu.lstickY = (s8)(vec_to_ledge_grab.Y * 127.0 / dist_to_ledge);
+        PICK_FIREFOX_ANGLE:
+        switch (HSD_Randi(5)) {
+        case 0: { // to ledge
+            cpu_data->cpu.lstickX = (s8)(vec_to_ledge_grab.X * 127.0 / dist_to_ledge);
+            cpu_data->cpu.lstickY = (s8)(vec_to_ledge_grab.Y * 127.0 / dist_to_ledge);
+
+            break;
+        }
+        case 1: { // straight
+            if (pos.Y < 5.0) goto PICK_FIREFOX_ANGLE;
+
+            cpu_data->cpu.lstickX = 127 * rec_data->direction;
+            break;
+        }
+        case 2: { // up
+            // aim to y point above ledge
+
+            float x = vec_to_ledge_grab.X;
+            float y = sqrtf(FOX_UPB_DISTANCE*FOX_UPB_DISTANCE - x*x);
+
+            float mul = 127.0 / FOX_UPB_DISTANCE;
+
+            cpu_data->cpu.lstickX = (s8)(x * mul) * rec_data->direction;
+            cpu_data->cpu.lstickY = (s8)(y * mul) * rec_data->direction;
+
+            break;
+        }
+        case 3: { // to plat
+            Platform side_plat;
+            if (!Recover_PlatformSide(&side_plat, rec_data->direction)) goto PICK_FIREFOX_ANGLE;
+            side_plat.y += 2.0; // make sure we get on top of the platform
+
+            Vec2 to_point_1 = { .X = side_plat.x_1 - pos.X, .Y = side_plat.y - pos.Y };
+            Vec2 to_point_2 = { .X = side_plat.x_2 - pos.X, .Y = side_plat.y - pos.Y };
+            float to_point_1_length = Vec2_Length(to_point_1);
+            float to_point_2_length = Vec2_Length(to_point_2);
+
+            float y = to_point_1.Y;
+            float x = sqrtf(FOX_UPB_DISTANCE*FOX_UPB_DISTANCE - y*y);
+            float mul = 127.0 / FOX_UPB_DISTANCE;
+
+            cpu_data->cpu.lstickX = (s8)(x * mul) * rec_data->direction;
+            cpu_data->cpu.lstickY = (s8)(y * mul) * rec_data->direction;
+            break;
+        }
+        case 4: { // just above stage
+            if (FOX_UPB_DISTANCE < dist_to_stage) goto PICK_FIREFOX_ANGLE;
+
+            float y = vec_to_stage.Y;
+            float x = sqrtf(FOX_UPB_DISTANCE*FOX_UPB_DISTANCE - y*y);
+            float mul = 127.0 / FOX_UPB_DISTANCE;
+
+            cpu_data->cpu.lstickX = (s8)(x * mul) * rec_data->direction;
+            cpu_data->cpu.lstickY = (s8)(y * mul) * rec_data->direction;
+
+            if (InFirefoxDeadzone(cpu_data->cpu.lstickX, cpu_data->cpu.lstickY)) 
+                goto PICK_FIREFOX_ANGLE;
+
+            break;
+        }
+        }
     } else {
         // survival DI
         cpu_data->cpu.lstickY = 90;
