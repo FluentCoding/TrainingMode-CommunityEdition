@@ -270,40 +270,72 @@ void Recover_ThinkFox(const Recover_Data * const rec_data, GOBJ *cpu, GOBJ *hmn)
 
     bool double_jump_rising = (state == ASID_JUMPAERIALF || state == ASID_JUMPAERIALB) && cpu_data->phys.self_vel.Y > 0.0;
 
+    int in_fastfall = cpu_data->flags.is_fastfall;
+    float drift_speed = cpu_data->attr.aerial_drift_max;
+    float fall_speed = in_fastfall ? cpu_data->attr.fastfall_velocity : cpu_data->attr.terminal_velocity;
+    float fall_slope = fall_speed / drift_speed;
+
+    float ledge_slope = fabs(vec_to_ledge_grab.Y) / fabs(vec_to_ledge_grab.X);
+    float stage_slope = fabs(vec_to_stage.Y) / fabs(vec_to_stage.X);
+    int can_fall_to_ledge = ledge_slope > fall_slope;
+    int can_fall_to_stage = stage_slope > fall_slope;
+
+    Platform side_plat;
+    if (!Recover_PlatformSide(&side_plat, rec_data->direction)) goto PICK_FIREFOX_ANGLE;
+    side_plat.y += 2.0; // make sure we get on top of the platform
+
     // Because the cpu is often set to double jump out of hitstun, 
     // we hardcode it to not upb immediately because we want the counter-action to "complete".
     if (Recover_IsAirActionable(cpu) && !double_jump_rising && rec_data->direction != 0) {
-        if (dist_to_ledge < FOX_UPB_DISTANCE) {
-            cpu_data->cpu.held |= HSD_BUTTON_B;
-            cpu_data->cpu.lstickY = 127;
-            return;
+        int n = HSD_Randi(100);
+
+        if (rec_data->jumps > 0) {
+            n -= 1;
+            if (n < 0 || vec_to_ledge_grab.Y > 0.0) {
+                cpu_data->cpu.held |= HSD_BUTTON_Y;
+                cpu_data->cpu.lstickX = 127 * rec_data->direction;
+                return;
+            }
         }
 
-        if (rec_data->jumps > 0 && pos.Y < 0.0) {
-            cpu_data->cpu.held |= HSD_BUTTON_Y;
-            cpu_data->cpu.lstickX = 127 * rec_data->direction;
-            return;
+        if (dist_to_ledge < FOX_UPB_DISTANCE) {
+            n -= 3;
+            if (n < 0 || (vec_to_ledge_grab.Y > 0.0 && dist_to_ledge > 70.0)) {
+                // upb
+                cpu_data->cpu.held |= HSD_BUTTON_B;
+                cpu_data->cpu.lstickY = 127;
+                return;
+            }
+        }
+
+        if (fabs(vec_to_ledge_grab.X) < FOX_SIDEB_DISTANCE_4_4 && vec_to_ledge_grab.Y <= 0.0) {
+            if (pos.Y > side_plat.y + 5.0)
+                n -= 1;
+            else
+                n -= 6;
+            if (n < 0) {
+                // side b
+                cpu_data->cpu.held |= HSD_BUTTON_B;
+                cpu_data->cpu.lstickX = 127 * rec_data->direction;
+                return;
+            }
+        }
+
+        if (!in_fastfall) {
+            n -= 2;
+            if (n < 0) {
+                cpu_data->cpu.lstickY = -127;
+                return;
+            }
         }
 
         cpu_data->cpu.lstickX = 127 * rec_data->direction;
         return;
-    } 
-
-    if (Recover_CanDrift(cpu)) { // special fall / in aerial / past ledge
+    } else if (Recover_CanDrift(cpu)) { // special fall / in aerial / past ledge
         if (vec_to_ledge_grab.Y > 0.0) {
             cpu_data->cpu.lstickY = -127;
             return;
         }
-
-        int in_fastfall = cpu_data->flags.is_fastfall;
-        float drift_speed = cpu_data->attr.aerial_drift_max;
-        float fall_speed = in_fastfall ? cpu_data->attr.fastfall_velocity : cpu_data->attr.terminal_velocity;
-        float fall_slope = drift_speed / fall_speed;
-
-        float ledge_slope = fabs(vec_to_ledge_grab.Y) / fabs(vec_to_ledge_grab.X);
-        float stage_slope = fabs(vec_to_stage.Y) / fabs(vec_to_stage.X);
-        int can_fall_to_ledge = ledge_slope > fall_slope;
-        int can_fall_to_stage = stage_slope > fall_slope;
 
         // if ambiguous if cpu can drift to ledge. then hold in regardless
         if (!can_fall_to_stage && vec_to_ledge_grab.X * rec_data->direction < 0.0) {
@@ -353,10 +385,6 @@ void Recover_ThinkFox(const Recover_Data * const rec_data, GOBJ *cpu, GOBJ *hmn)
             break;
         }
         case 3: { // to plat
-            Platform side_plat;
-            if (!Recover_PlatformSide(&side_plat, rec_data->direction)) goto PICK_FIREFOX_ANGLE;
-            side_plat.y += 2.0; // make sure we get on top of the platform
-
             Vec2 to_point_1 = { .X = side_plat.x_1 - pos.X, .Y = side_plat.y - pos.Y };
             Vec2 to_point_2 = { .X = side_plat.x_2 - pos.X, .Y = side_plat.y - pos.Y };
             float to_point_1_length = Vec2_Length(to_point_1);
