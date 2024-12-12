@@ -258,7 +258,7 @@ void Recover_ThinkFox(const Recover_Data * const rec_data, GOBJ *cpu, GOBJ *hmn)
 
     Vec2 ledge_grab_offset = { -10.0 * rec_data->direction, -7.0 };
     Vec2 ledge_grab_point = Vec2_add(rec_data->ledge, ledge_grab_offset);
-    Recover_DebugPointSet(0, ledge_grab_point, 1);
+    //Recover_DebugPointSet(0, ledge_grab_point, 1);
     Vec2 vec_to_ledge_grab = Vec2_sub(ledge_grab_point, pos);
     float dist_to_ledge = Vec2_Length(vec_to_ledge_grab);
 
@@ -425,11 +425,11 @@ Recover_Ret Recover_Think(GOBJ *cpu, GOBJ *hmn) {
     FighterData *cpu_data = cpu->userdata;
     FighterData *hmn_data = hmn->userdata;
 
+    Recover_Data data;
     Vec2 ledges[2];
     Recover_LedgeCoords(ledges);
-    float xpos = cpu_data->phys.pos.X;
 
-    Recover_Data data;
+    float xpos = cpu_data->phys.pos.X;
     data.ledge = ledges[xpos > 0.0];
     if (xpos < ledges[0].X)
         data.direction = 1;
@@ -439,7 +439,7 @@ Recover_Ret Recover_Think(GOBJ *cpu, GOBJ *hmn) {
         data.direction = -1;
     data.jumps = cpu_data->attr.max_jumps - cpu_data->jump.jumps_used;
 
-    // normal getup from ledge
+    // Normal getup from ledge
     if (cpu_data->state_id == ASID_CLIFFWAIT && cpu_data->state.frame == 1) {
         cpu_data->cpu.lstickX = 127 * data.direction;
         return RECOVER_IN_PROGRESS;
@@ -447,7 +447,15 @@ Recover_Ret Recover_Think(GOBJ *cpu, GOBJ *hmn) {
         return RECOVER_IN_PROGRESS;
     }
 
-    if (cpu_data->phys.air_state == 0) // is grounded
+    // Respawn platform
+    if (cpu_data->state_id == ASID_REBIRTHWAIT) {
+        if (cpu_data->TM.state_frame & 1)
+            cpu_data->cpu.lstickY = -127;
+        return RECOVER_IN_PROGRESS;
+    }
+
+    // Finish recovery if grounded
+    if (cpu_data->phys.air_state == 0)
         return RECOVER_FINISHED;
 
     switch (cpu_data->kind) {
