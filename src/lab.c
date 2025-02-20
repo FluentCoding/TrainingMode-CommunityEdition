@@ -118,6 +118,57 @@ void Lab_CustomOSDsThink(void) {
     }
 }
 
+void (*unload_char_files)(void) = 0x800852b0;
+
+// despawn 8016ef98
+void Lab_ChangeCPUCharacter(GOBJ *menu_gobj, int c_kind) {
+    Fighter_DespawnMidMatch(1);
+    Archive_Free(File_GetPreloadedFile("PlDk.dat"));
+    Archive_Free(File_GetPreloadedFile("PlDkNr.dat"));
+    
+    //const char *files[] = {
+    //    "PlDk.dat",
+    //    //"PlDkAJ.dat",
+    //    //"PlDkBk.dat",
+    //    //"PlDkBu.dat",
+    //    //"PlDkDViWaitAJ.dat",
+    //    //"PlDkGr.dat",
+    //    "PlDkNr.dat",
+    //    //"PlDkRe.dat",
+    //};
+
+    //for (int i = 0; i < sizeof(files)/sizeof(*files); ++i) {
+    //    //HSD_Archive *a = Archive_LoadFile(files[i]);
+    //    HSD_Archive *a = File_GetPreloadedFile(files[i]);
+    //    if (a > 0x80000000) Archive_Free(a);
+    //    //OSReport("%s %p\n", files[i], a);
+    //    //if (a) Archive_Free(a);
+    //}
+
+    //unload_char_files();
+    //Preload_FreeEntry();
+    //FtCreateData data = { .c_kind = c_kind, .ply = 1 };
+    //GOBJ *cpu = Fighter_Create(&data);
+    //FighterData *cpu_data = cpu->userdata;
+    //Fighter_Playerblock_Init(1);
+
+    PlayerData data = {
+        .c_kind = CKIND_FALCON,
+        .p_kind = PKIND_CPU,
+        .costume = 0,
+        .isEntry = false,
+        .attack = 1.f,
+        .defense = 1.f,
+        .scale = 1.f,
+    };
+
+    Fighter_SpawnMidMatch(1, &data);
+
+    //FighterData *cpu_data = Fighter_GetGObj(1)->userdata;
+    //OSReport("kind %u\n", cpu_data->kind);
+    //OSReport("ply %u\n", cpu_data->ply);
+}
+
 void Lab_ChangeStadiumTransformation(GOBJ *menu_gobj, int value) {
     // Transformation decision making is entirely located in one HUGE function (PokemonStadium_TransformationDecide),
     // so instead of just having a simple "SetTransformation(Fire)" function call,

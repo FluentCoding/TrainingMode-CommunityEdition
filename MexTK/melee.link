@@ -3,6 +3,9 @@
 80323DC8:_vsprintf
 80068E98:Fighter_Create
 800BE7E0:Fighter_Create2
+80031ebc:Fighter_Destroy
+8016eddc:Fighter_SpawnMidMatch
+8016ef98:Fighter_DespawnMidMatch
 800693AC:ActionStateChange
 8036410C:AOBJ_ReqAnim
 8036530C:AOBJ_SetRate

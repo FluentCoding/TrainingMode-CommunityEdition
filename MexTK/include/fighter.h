@@ -3157,6 +3157,15 @@ struct FtScriptIK
 }; // 52
 */
 
+typedef struct FtCreateData {
+    FighterKind c_kind;
+    u8 ply;
+    u8 unk5;
+    u8 flags_b0 : 1;
+    u8 flags_b1 : 1;
+    u32 unk8;
+} FtCreateData;
+
 /** Static Variables **/
 static ftCommonBone ***stc_ftbone = (R13 + -0x515C);
 static ftCommonData **stc_ftcommon = (R13 + -0x514C);
@@ -3167,8 +3176,11 @@ static int *stc_ft_hitlog = (R13 + -0x5148); // used as semi-local variables rem
 static int *stc_ft_tiplog = (R13 + -0x5144); // used as semi-local variables remembering if a tip hit occured @ 8006cbc4
 
 /*** Functions ***/
-GOBJ *Fighter_Create(PlayerData *pd);
-GOBJ *Fighter_Create2(PlayerData *pd);
+GOBJ *Fighter_Create(FtCreateData *pd);
+GOBJ *Fighter_Create2(FtCreateData *pd);
+void Fighter_SpawnMidMatch(int ply, PlayerData *data);
+void Fighter_DespawnMidMatch(int ply);
+void Fighter_Destroy(int ply);
 void ActionStateChange(float startFrame, float animSpeed, float animBlend, GOBJ *fighter, int stateID, int flags1, GOBJ *alt_state_source);
 void Fighter_UpdateAnim(GOBJ *f);      // 8006a360
 void Fighter_UpdateIASA(GOBJ *f);      // 8006ad10

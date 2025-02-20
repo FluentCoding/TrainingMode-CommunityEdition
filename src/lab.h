@@ -1510,6 +1510,7 @@ enum cpu_option
     OPTCPU_GRABRELEASE,
     OPTCPU_SET_POS,
     OPTCPU_CTRL_BY,
+    OPTCPU_CHARACTER,
 
     OPTCPU_COUNT
 };
@@ -1526,6 +1527,12 @@ static char *LabValues_GrabEscape[] = {"None", "Medium", "High", "Perfect"};
 static char *LabValues_GrabRelease[] = {"Grounded", "Airborn"};
 static char *LabValues_LockCPUPercent[] = {"Off", "On"};
 static char *LabValues_CPUControlledBy[] = {"None", "Port 1", "Port 2", "Port 3", "Port 4"};
+static char *LabValues_Character[] = {
+    "FALCON", "DK", "FOX", "GAW", "KIRBY", "BOWSER", "LINK", "LUIGI",
+    "MARIO", "MARTH", "MEWTWO", "NESS", "PEACH", "PIKACHU", "ICECLIMBERS",
+    "JIGGLYPUFF", "SAMUS", "YOSHI", "ZELDA", "SHEIK", "FALCO", "YOUNGLINK",
+    "DRMARIO", "ROY", "PICHU", "GANONDORF"
+};
 
 static const EventOption LabOptions_CPU_MoveCPU = {
     .option_kind = OPTKIND_FUNC,
@@ -1710,6 +1717,14 @@ static EventOption LabOptions_CPU[OPTCPU_COUNT] = {
         .option_name = "Controlled By",
         .desc = "Select another port to control the CPU.",
         .option_values = LabValues_CPUControlledBy,
+    },
+    {
+        .option_kind = OPTKIND_STRING,
+        .value_num = sizeof(LabValues_Character) / 4,
+        .option_name = "Character",
+        .desc = "Change the CPU's character.",
+        .option_values = LabValues_Character,
+        .onOptionChange = Lab_ChangeCPUCharacter,
     },
 };
 
