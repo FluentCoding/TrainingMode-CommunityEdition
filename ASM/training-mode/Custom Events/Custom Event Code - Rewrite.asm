@@ -8288,6 +8288,7 @@ ArmadaShine_InitializePositions_DirectionChangeEnd:
     li r4, ASID_AttackAirB
     branchl r12, 0x8008cfac
     # Fastforward to frame 7
+    SetBreakpoint
     li r3, 7
     bl IntToFloat
     mr r3, REG_P1GObj

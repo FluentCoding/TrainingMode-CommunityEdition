@@ -3169,6 +3169,7 @@ static int *stc_ft_tiplog = (R13 + -0x5144); // used as semi-local variables rem
 /*** Functions ***/
 GOBJ *Fighter_Create(PlayerData *pd);
 GOBJ *Fighter_Create2(PlayerData *pd);
+void Fighter_EnterAerial(GOBJ *fighter, int aerialState);
 void ActionStateChange(float startFrame, float animSpeed, float animBlend, GOBJ *fighter, int stateID, int flags1, GOBJ *alt_state_source);
 void FrameSpeedChange(GOBJ *f, float speed);
 void Fighter_UpdateAnim(GOBJ *f);      // 8006a360
@@ -3179,6 +3180,7 @@ void Fighter_UpdateAccessory(GOBJ *f); // 8006c624
 void Fighter_UpdateGFX(GOBJ *f);       // 8006c80c
 void Fighter_UpdateAllHitboxPos(GOBJ *f);
 void Fighter_UpdateBonePos(FighterData *fighter_data, int unk);
+void Fighter_SubactionFastForward(GOBJ *fighter);
 FtAction *Fighter_GetFtAction(FighterData *fighter, int action_id); // returns the desired ft action entry stored in the dat file
 Figatree *Fighter_GetAnimData(FighterData *fighter, int action_id); // this will request the anim data from the AJ file in ARAM and overwrite the current animation!
 float Fighter_GetAnimLength(Figatree *ft_anim);
