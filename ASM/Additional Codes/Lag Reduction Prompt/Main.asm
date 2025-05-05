@@ -199,7 +199,7 @@ LagPrompt_SceneLoad_CreateText:
     mflr r4
     lfs f1, PromptX(REG_TextProp)
     lfs f2, PromptY(REG_TextProp)
-    branchl r12, 0x803a6b98
+    branchl r12, Text_InitializeSubtext
     mr REG_SubtextID, r3
     # Change Text Scale
     mr r3, REG_TextGObj             # struct pointer
@@ -215,7 +215,7 @@ LagPrompt_SceneLoad_CreateText:
     mflr r4
     lfs f1, YesX(REG_TextProp)
     lfs f2, YesY(REG_TextProp)
-    branchl r12, 0x803a6b98
+    branchl r12, Text_InitializeSubtext
     mr REG_SubtextID, r3
     # Change Text Scale
     mr r3, REG_TextGObj             # struct pointer
@@ -231,7 +231,7 @@ LagPrompt_SceneLoad_CreateText:
     mflr r4
     lfs f1, NoX(REG_TextProp)
     lfs f2, NoY(REG_TextProp)
-    branchl r12, 0x803a6b98
+    branchl r12, Text_InitializeSubtext
     mr REG_SubtextID, r3
     # Change Text Scale
     mr r3, REG_TextGObj             # struct pointer
@@ -301,7 +301,7 @@ LagPrompt_SceneThink:
     # Adjust Menu Choice
     # Get all player inputs
     li r3, 4
-    branchl r12, 0x801a36c0
+    branchl r12, Inputs_GetPlayerRapidInputs
     mr REG_Inputs, r3
     # Check for movement to the right
     rlwinm. r0, REG_Inputs, 0, 0x80
@@ -353,7 +353,7 @@ LagPrompt_SceneThink_HighlightSelection:
 
 LagPrompt_SceneThink_CheckForA:
     li r3, 4
-    branchl r12, 0x801a36a0
+    branchl r12, Inputs_GetPlayerInstantInputs
     rlwinm. r0, r4, 0, 0x100
     bne LagPrompt_SceneThink_Confirmed
     rlwinm. r0, r4, 0, 0x1000

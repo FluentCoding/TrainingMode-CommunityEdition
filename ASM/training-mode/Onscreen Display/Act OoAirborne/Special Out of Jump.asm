@@ -1,5 +1,5 @@
     # To be inserted at 800cb354
-    .include "../../Globals.s"
+    .include "../../../Globals.s"
 
     .set player, 30
 

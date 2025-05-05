@@ -91,8 +91,6 @@ void Event_Init(GOBJ *gobj)
 
     // set CPU AI to no_act 15
     //cpu_data->cpu.ai = 0;
-
-    return;
 }
 // Think Function
 void Event_Think(GOBJ *event)
@@ -109,8 +107,6 @@ void Event_Think(GOBJ *event)
 
     LCancel_Think(event_data, hmn_data);
     Barrel_Think(event_data);
-
-    return;
 }
 void Event_Exit()
 {
@@ -121,11 +117,6 @@ void Event_Exit()
 
     // cleanup
     Match_EndVS();
-
-    // unfreeze
-    HSD_Update *update = stc_hsd_update;
-    update->pause_kind = PAUSEKIND_NONE;
-    return;
 }
 
 // L-Cancel functions
@@ -324,8 +315,6 @@ void LCancel_Think(LCancelData *event_data, FighterData *hmn_data)
 
     // update HUD anim
     JOBJ_AnimAll(hud_jobj);
-
-    return;
 }
 void LCancel_HUDCamThink(GOBJ *gobj)
 {
@@ -335,8 +324,6 @@ void LCancel_HUDCamThink(GOBJ *gobj)
     {
         CObjThink_Common(gobj);
     }
-
-    return;
 }
 
 // Tips Functions
@@ -345,8 +332,6 @@ void Tips_Toggle(GOBJ *menu_gobj, int value)
     // destroy existing tips when disabling
     if (value == 1)
         event_vars->Tip_Destroy();
-
-    return;
 }
 void Tips_Think(LCancelData *event_data, FighterData *hmn_data)
 {
@@ -495,7 +480,6 @@ void Tips_Think(LCancelData *event_data, FighterData *hmn_data)
             }
         }
     }
-    return;
 }
 
 // Barrel Functions
@@ -594,8 +578,6 @@ void Barrel_Think(LCancelData *event_data)
         break;
     }
     }
-
-    return;
 }
 GOBJ *Barrel_Spawn(int pos_kind)
 {
@@ -711,11 +693,10 @@ GOBJ *Barrel_Spawn(int pos_kind)
 }
 void Barrel_Null()
 {
-    return;
+    return; // Do nothing on purpose
 }
 void Barrel_Break(GOBJ *barrel_gobj)
 {
-
     ItemData *barrel_data = barrel_gobj->userdata;
     Effect_SpawnSync(1063, barrel_gobj, &barrel_data->pos);
     SFX_Play(251);
@@ -729,8 +710,6 @@ void Barrel_Break(GOBJ *barrel_gobj)
     barrel_data->item_var.var2 = 40;
     barrel_data->xdcf3 = 1;
     ItemStateChange(barrel_gobj, 7, 2);
-
-    return;
 }
 int Barrel_OnHurt(GOBJ *barrel_gobj)
 {

@@ -1,5 +1,5 @@
     # To be inserted at 8008faf0
-    .include "../../Globals.s"
+    .include "../../../Globals.s"
     .include "../../../m-ex/Header.s"
 
     # Branch to Interrupt Check With Interrupt Bool in r3 and player in r4

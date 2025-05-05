@@ -1,5 +1,5 @@
     # To be inserted at 8016e91c
-    .include "../../Globals.s"
+    .include "../../../Globals.s"
     .include "../../../m-ex/Header.s"
 
     # *************************************************
@@ -27,7 +27,7 @@
     # OSReport Difference
     bl OSReportString
     mflr r3
-    branchl r12, 0x803456a8
+    branchl r12, OSReport
     b Exit
 
 OSReportString:

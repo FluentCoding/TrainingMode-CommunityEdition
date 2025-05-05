@@ -1,5 +1,5 @@
     # To be inserted at 80089610
-    .include "../../../Globals.s"
+    .include "../../../../Globals.s"
     .include "../../../../m-ex/Header.s"
 
     # Check If Move Was Interrupted With the Same Move

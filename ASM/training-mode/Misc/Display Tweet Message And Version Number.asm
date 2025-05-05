@@ -1,7 +1,5 @@
     # To be inserted at 80394a6c
-    .include "../Globals.s"
-
-    .set VersionString, 0x8040a58c
+    .include "../../Globals.s"
 
 # Remove all previous OSReports
 # load r3, 0x804cf7e8
@@ -10,7 +8,7 @@
 
     # Play SFX?
     li r3, 317              # 188 = warning #317 = gasp
-    branchl r12, 0x801c53ec
+    branchl r12, SFX_PlaySoundAtFullVolume
 
 #############################
 ## OS Report Tweet Message ##

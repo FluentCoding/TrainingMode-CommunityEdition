@@ -1,7 +1,7 @@
     # To be inserted at 800ccb40
     # This ASM is injected to "800CCAAC:Fighter_IASACheck_AllAerial" function which is called from some air action states' IASA function.
     # So this can affect to other action states' IASA besides "Fall".
-    .include "../../Globals.s"
+    .include "../../../Globals.s"
 
     .set player, 31
 

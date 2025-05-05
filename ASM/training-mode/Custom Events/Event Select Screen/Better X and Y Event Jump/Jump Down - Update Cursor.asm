@@ -1,5 +1,5 @@
     # To be inserted at 8024da98
-    .include "../../../Globals.s"
+    .include "../../../../Globals.s"
     .include "../../../../m-ex/Header.s"
 
     # Update cursor position
@@ -30,7 +30,7 @@
     stfs f1, 0x3C(r3)
     # DirtySub
     lwz r3, 0x40(sp)
-    branchl r12, 0x803732e8
+    branchl r12, HSD_JObjSetMtxDirtySub
     b Original
 
 Float:

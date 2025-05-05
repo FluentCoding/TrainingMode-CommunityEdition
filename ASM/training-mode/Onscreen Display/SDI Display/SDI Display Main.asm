@@ -1,5 +1,5 @@
     # To be inserted at 8008e52c
-    .include "../../Globals.s"
+    .include "../../../Globals.s"
     .include "../../../m-ex/Header.s"
 
     .set REG_FighterData, 31
@@ -24,7 +24,7 @@
     # CHECK IF ENABLED
     li r0, OSD.SDI                  # PowerShield ID
     # lwz r4, -0xdbc(rtoc) #get frame data toggle bits
-    lwz r4, -0x77C0(r13)
+    lwz r4, MemcardData(r13)
     lwz r4, 0x1F24(r4)
     li r3, 1
     slw r0, r3, r0

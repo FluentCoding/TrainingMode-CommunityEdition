@@ -1,8 +1,7 @@
     # To be inserted at 801a49a8
-    .include "../../Globals.s"
-    .include "../../../m-ex/Header.s"
+    .include "../../../Globals.s"
 
-    lwz r0, -0x6C98(r13)
+    lwz r0, DEBUGLV(r13)
     cmpwi r0, 3
     bge isDebug
 

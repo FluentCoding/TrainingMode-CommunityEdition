@@ -1,5 +1,5 @@
     # To be inserted at 8006ab78
-    .include "../../../Globals.s"
+    .include "../../../../Globals.s"
     .include "../../../../m-ex/Header.s"
 
 # Inc Frame Count + Frames Tangible + Hitstun

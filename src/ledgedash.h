@@ -83,7 +83,6 @@ void Event_Exit();
 void Event_Update();
 void Tips_Toggle(GOBJ *menu_gobj, int value);
 void Ledgedash_ToggleStartPosition(GOBJ *menu_gobj, int value);
-void Ledgedash_ToggleAutoReset(GOBJ *menu_gobj, int value);
 void Ledgedash_HUDCamThink(GOBJ *gobj);
 void Ledgedash_ChangeCamMode(GOBJ *gobj, int value);
 GOBJ *Ledgedash_HitLogInit();

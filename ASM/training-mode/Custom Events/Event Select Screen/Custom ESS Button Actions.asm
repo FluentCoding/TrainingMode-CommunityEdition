@@ -1,5 +1,5 @@
     # To be inserted at 8024d92c
-    .include "../../Globals.s"
+    .include "../../../Globals.s"
     .include "../../../m-ex/Header.s"
 
     backup
@@ -7,8 +7,14 @@
     # Check For L
     li r3, 4
     branchl r12, Inputs_GetPlayerInstantInputs
-    rlwinm. r0, r4, 0, 25, 25   # CHECK FOR L
+    
+    rlwinm. r0, r4, 0, 25, 25   # CHECK FOR L HARD PRESS
     bne OpenFDD
+    
+    load r3, 0x804c20bc # stc_css_pad
+    lbz r3, 0x1C(r3) # triggerLeft
+    cmpwi r3, 20
+    bge OpenFDD
 
     /*
     rlwinm. r0, r4, 0, 27, 27   # CHECK FOR Z
@@ -42,7 +48,7 @@ CheckToSwitchPage:
 OpenFDD:
     # PLAY SFX
     li r3, 1
-    branchl r4, 0x80024030
+    branchl r4, SFX_MenuCommonSound
 
     # SET FLAG IN RULES STRUCT
     li r0, 3                    # 3 = frame data from event toggle
@@ -59,7 +65,7 @@ OpenFDD:
     lbz r3, 0x0(r5)
     lwz r4, 0x4(r5)
     add r3, r3, r4
-    lwz r4, -0x77C0(r13)
+    lwz r4, MemcardData(r13)
     stb r3, 0x0535(r4)
 
     # LOAD RSS
@@ -67,7 +73,7 @@ OpenFDD:
 
     # REMOVE EVENT THINK FUNCTION
     lwz r3, -0x3E84(r13)
-    branchl r12, 0x80390228
+    branchl r12, GObj_Destroy
 
     b exit
 
@@ -155,7 +161,7 @@ SwitchPage_DrawEventTextLoop:
     li r0, 0
     stw r0, 0x3C(r3)
     # DirtySub
-    branchl r12, 0x803732e8
+    branchl r12, HSD_JObjSetMtxDirtySub
 
     # Play SFX
     li r3, 2

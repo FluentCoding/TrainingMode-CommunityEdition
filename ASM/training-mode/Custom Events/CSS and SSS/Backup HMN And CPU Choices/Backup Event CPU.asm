@@ -1,9 +1,9 @@
     # To be inserted at 801bab18
-    .include "../../../Globals.s"
+    .include "../../../../Globals.s"
     .include "../../../../m-ex/Header.s"
 
     # Get Backup Location
-    lwz r9, -0x77C0(r13)
+    lwz r9, MemcardData(r13)
     addi r9, r9, 3344
     # Backup HMN Character Choice
     lwz r3, CSS_Data(r13)   # CSS Match Info
@@ -16,7 +16,7 @@
 
     # Also copy to Event's CSS Backup Data for compatibility
     # Get Backup Location
-    lwz r9, -0x77C0(r13)
+    lwz r9, MemcardData(r13)
     addi r9, r9, 1328
     # Backup HMN Character Choice
     lwz r3, CSS_Data(r13)   # CSS Match Info
@@ -28,7 +28,7 @@
     branchl r12, 0x801b0730
 
     # Get Backup Location
-    lwz r9, -0x77C0(r13)
+    lwz r9, MemcardData(r13)
     addi r9, r9, 3344
     # Backup CPU Character Choice
     lwz r3, CSS_Data(r13)   # CSS Match Info

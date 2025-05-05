@@ -1,12 +1,11 @@
     # To be inserted at 801a4c08
-    .include "../../Globals.s"
-    .include "../../../m-ex/Header.s"
+    .include "../../../Globals.s"
 
-    # Finish storing function
+    # Finish storing function (original code line)
     stw r0, 0x0028(r31)
 
     # Check if DBLevel
-    lwz r0, -0x6C98(r13)
+    lwz r0, DEBUGLV(r13)
     cmpwi r0, 3
     bge isDebug
 

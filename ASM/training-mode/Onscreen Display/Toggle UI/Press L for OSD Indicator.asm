@@ -1,12 +1,10 @@
     # To be inserted at 80231618
-    .include "../../Globals.s"
+    .include "../../../Globals.s"
     .include "../../../m-ex/Header.s"
 
     .set text, 31
     .set textproperties, 30
     .set originalRegister, 29
-
-    .set VersionString, 0x8040a58c
 
     backup
 
@@ -20,7 +18,7 @@
     # CREATE TEXT OBJECT, RETURN POINTER TO STRUCT IN r3
     li r3, 0
     li r4, 1
-    branchl r12, 0x803a6754
+    branchl r12, Text_CreateTextStruct
 
     # BACKUP STRUCT POINTER
     mr text, r3
@@ -59,7 +57,7 @@
     mr r3, text                     # struct pointer
     bl Text
     mflr r4
-    branchl r12, 0x803a6b98
+    branchl r12, Text_InitializeSubtext
     # Change scale
     mr r4, r3
     mr r3, text

@@ -10,7 +10,7 @@
 
     # Ensure only all other legal stages are enabled
     # Get Random Stage Select Bitflags
-    lwz REG_RulesPointer, -0x77C0(r13)
+    lwz REG_RulesPointer, MemcardData(r13)
     addi REG_RulesPointer, REG_RulesPointer, 7344
     lwz REG_RandomStageField, 0x18(REG_RulesPointer)
     # Check if only all legal stages are on

@@ -1,5 +1,5 @@
     # To be inserted at 80236064
-    .include "../../Globals.s"
+    .include "../../../Globals.s"
     .include "../../../m-ex/Header.s"
 
     # CHECK FLAG IN RULES STRUCT

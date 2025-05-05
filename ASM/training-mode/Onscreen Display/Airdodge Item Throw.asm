@@ -1,7 +1,7 @@
 # To be inserted at 80099c7C
 # Just after determining to start an item throw/zdrop in Interrupt_AS_EscapeAir_Airdodge
 
-    .include "../Globals.s"
+    .include "../../Globals.s"
     .include "../../m-ex/Header.s"
 
     .set playerdata, 31
@@ -16,7 +16,7 @@
 
     # CHECK IF ENABLED
     li r0, OSD.RollAirdodgeInterrupt
-    lwz r4, -0x77C0(r13)
+    lwz r4, MemcardData(r13)
     lwz r4, 0x1F24(r4)
     li r3, 1
     slw r0, r3, r0

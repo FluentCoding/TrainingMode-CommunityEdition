@@ -38,7 +38,7 @@ DoesNotExist:
     mflr r3
     mr r4, REG_ID
     mr r5, REG_ArticleID
-    branchl r12, 0x803456a8
+    branchl r12, OSReport
     # Assert
     bl Assert_Name
     mflr r3

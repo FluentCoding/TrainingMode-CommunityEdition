@@ -1,5 +1,5 @@
     # To be inserted at 801a10e8
-    .include "../../Globals.s"
+    .include "../../../Globals.s"
     .include "../../../m-ex/Header.s"
 
     .set text, 31
@@ -21,7 +21,7 @@
     # CREATE TEXT OBJECT, RETURN POINTER TO STRUCT IN r3
     li r3, 2
     lwz r4, 0x0(staticTextData)
-    branchl r12, 0x803a6754
+    branchl r12, Text_CreateTextStruct
     mr text, r3
 
     # Store pointer to text
@@ -56,13 +56,13 @@
     lfs f2, 0x14(textproperties)    # Y offset of text
     bl TextBackground
     mflr r4
-    branchl r12, 0x803a6b98
+    branchl r12, Text_InitializeSubtext
     # set size/scaling
     mr r4, r3
     mr r3, text
     lfs f1, 0x18(textproperties)    # get text scaling value from table
     lfs f2, 0x1C(textproperties)    # get text scaling value from table
-    branchl r12, 0x803a7548
+    branchl r12, Text_UpdateSubtextSize
 
     # SET TEXT SPACING TO TIGHT
     li r4, 0x1
@@ -77,13 +77,13 @@
     lbz r5, 0x18(inputStruct)
     lfs f3, 0x20(inputStruct)
     crset 6
-    branchl r12, 0x803a6b98
+    branchl r12, Text_InitializeSubtext
     # set size/scaling
     mr r4, r3
     mr r3, text
     lfs f1, 0x8(textproperties)     # get text scaling value from table
     lfs f2, 0x8(textproperties)     # get text scaling value from table
-    branchl r12, 0x803a7548
+    branchl r12, Text_UpdateSubtextSize
 
     # Init Textline Y
     mr r3, text                     # struct pointer
@@ -94,13 +94,13 @@
     lbz r5, 0x19(inputStruct)
     lfs f3, 0x24(inputStruct)
     crset 6
-    branchl r12, 0x803a6b98
+    branchl r12, Text_InitializeSubtext
     # set size/scaling
     mr r4, r3
     mr r3, text
     lfs f1, 0x8(textproperties)     # get text scaling value from table
     lfs f2, 0x8(textproperties)     # get text scaling value from table
-    branchl r12, 0x803a7548
+    branchl r12, Text_UpdateSubtextSize
 
 ###############################
 ## Schedule Updater Function ##
@@ -110,7 +110,7 @@
     li r3, 6
     li r4, 0
     li r5, 128
-    branchl r12, 0x803901f0
+    branchl r12, GObj_Create
     mr GObj, r3
 
     # Store Pointer
@@ -121,7 +121,7 @@
     bl TextUpdateFunction
     mflr r4
     li r5, 10
-    branchl r12, 0x8038fd54
+    branchl r12, GObj_AddProc
 
     b Exit
 
@@ -195,7 +195,7 @@ XUpdateColor:
     mr r3, text
     li r4, 1
     addi r5, sp, 0xF8
-    branchl r12, 0x803a74f0
+    branchl r12, Text_ChangeTextColor
 
     # Update Textline X
     mr r3, text                     # struct pointer
@@ -210,7 +210,7 @@ XUpdateColor:
     lfs f1, 0x20(inputStruct)
     fabs f1, f1
     crset 6
-    branchl r12, 0x803a70a0
+    branchl r12, Text_UpdateSubtextContents
 
     # Update Y Color
     lbz r6, 0x19(inputStruct)
@@ -231,7 +231,7 @@ YUpdateColor:
     mr r3, text
     li r4, 2
     addi r5, sp, 0xF8
-    branchl r12, 0x803a74f0
+    branchl r12, Text_ChangeTextColor
 
     # Update Textline Y
     mr r3, text                     # struct pointer
@@ -246,7 +246,7 @@ YUpdateColor:
     lfs f1, 0x24(inputStruct)
     fabs f1, f1
     crset 6
-    branchl r12, 0x803a70a0
+    branchl r12, Text_UpdateSubtextContents
 
     restore
     blr

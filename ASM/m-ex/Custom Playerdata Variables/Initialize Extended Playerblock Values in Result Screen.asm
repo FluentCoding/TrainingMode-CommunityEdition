@@ -9,7 +9,7 @@
     load r4, 0x80458fd0
     lwz r4, 0x20(r4)
     # Zero Entire Data Block
-    branchl r12, 0x8000c160
+    branchl r12, ZeroAreaLength
 
 exit:
     mr r3, r30

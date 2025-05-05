@@ -1,7 +1,7 @@
     # To be inserted at 8006b7f4
     # Runs once per frame, use for OSDs that don't require a specific injection point
 
-    .include "../Globals.s"
+    .include "../../Globals.s"
     .include "../../m-ex/Header.s"
 
     .set playerdata, 31
@@ -11,7 +11,7 @@
 
 OSD_FighterSpecificTech:
     li r0, OSD.FighterSpecificTech    # OSD ID
-    lwz r4, -0x77C0(r13)
+    lwz r4, MemcardData(r13)
     lwz r4, 0x1F24(r4)
     li r3, 1
     slw r0, r3, r0
@@ -396,7 +396,7 @@ FighterSpecificTech_End:
 OSD_Lockout:
     # Check enabled
     li r0, OSD.LockoutTimers
-    lwz r4, -0x77C0(r13)
+    lwz r4, MemcardData(r13)
     lwz r4, 0x1F24(r4)
     li r3, 1
     slw r0, r3, r0
@@ -450,7 +450,7 @@ Lockout_End:
 
 OSD_DJL:
     li r0, OSD.FighterSpecificTech    # OSD ID
-    lwz r4, -0x77C0(r13)
+    lwz r4, MemcardData(r13)
     lwz r4, 0x1F24(r4)
     li r3, 1
     slw r0, r3, r0

@@ -1,61 +1,7 @@
     # To be inserted at 80005928
-    .macro branchl reg, address
-    lis \reg, \address @h
-    ori \reg, \reg, \address @l
-    mtctr \reg
-    bctrl
-    .endm
+    .include "../../../Globals.s"
+    .include "../../../m-ex/Header.s"
 
-    .macro branch reg, address
-    lis \reg, \address @h
-    ori \reg, \reg, \address @l
-    mtctr \reg
-    bctr
-    .endm
-
-    .macro load reg, address
-    lis \reg, \address @h
-    ori \reg, \reg, \address @l
-    .endm
-
-    .macro loadf regf, reg, address
-    lis \reg, \address @h
-    ori \reg, \reg, \address @l
-    stw \reg, -0x4(sp)
-    lfs \regf, -0x4(sp)
-    .endm
-
-    .macro backup
-    mflr r0
-    stw r0, 0x4(r1)
-    stwu r1, -0x100(r1)         # make space for 12 registers
-    stmw r20, 0x8(r1)
-    .endm
-
-    .macro restore
-    lmw r20, 0x8(r1)
-    lwz r0, 0x104(r1)
-    addi r1, r1, 0x100          # release the space
-    mtlr r0
-    .endm
-
-    .macro intToFloat reg, reg2
-    xoris \reg, \reg, 0x8000
-    lis r18, 0x4330
-    lfd f16, -0x7470(rtoc)      # load magic number
-    stw r18, 0(r2)
-    stw \reg, 4(r2)
-    lfd \reg2, 0(r2)
-    fsubs \reg2, \reg2, f16
-    .endm
-
-    .set ActionStateChange, 0x800693ac
-    .set HSD_Randi, 0x80380580
-    .set HSD_Randf, 0x80380528
-    .set Wait, 0x8008a348
-    .set Fall, 0x800cc730
-
-    .set entity, 31
     .set playerdata, 31
     .set messageStruct, 30
     .set text, 29
@@ -97,7 +43,7 @@
     mr textprop, r7
 
     # Load Max Number of Windows Variable From OSD Menu
-    lwz r3, -0x77C0(r13)        # Get Memcard Data
+    lwz r3, MemcardData(r13)        # Get Memcard Data
     lbz MaxWindows, 0x1f28(r3)
 
     # Get Window's Area in the Message Struct in r3
@@ -113,7 +59,7 @@
 
     # Remove Old Area 3 Window
     lwz r3, 0x0(messageStruct)
-    branchl r12, 0x803a5cc4
+    branchl r12, Text_RemoveText
     b CreateText
 
 GetPlayersArea:
@@ -139,7 +85,7 @@ CreateText:
     li r3, 0x2
     load r4, 0x804a1f58         # get text objects ID?
     lwz r4, 0x0(r4)
-    branchl r12, 0x803a6754
+    branchl r12, Text_CreateTextStruct
 
     # STORE PLAYERS TEXT POINTER
     mr r29, r3                  # backup text pointer
@@ -193,7 +139,7 @@ GetYLocation:
     mflr r4                     # get ASCII to print
     lfs f1, -0x37B4(rtoc)       # default text X/Y
     lfs f2, 0x10(textprop)      # background Y
-    branchl r12, 0x803a6b98
+    branchl r12, Text_InitializeSubtext
 
     # CHANGE TEXT COLOR TO BLACK
     mr r3, text
@@ -201,14 +147,14 @@ GetYLocation:
     li r5, 0x0
     stw r5, 0xF0(sp)
     addi r5, sp, 0xF0
-    branchl r12, 0x803a74f0
+    branchl r12, Text_ChangeTextColor
 
     # CHANGE TEXT SIZE
     mr r3, text
     li r4, 0x0
     lfs f1, 0x14(textprop)      # stretch X (12)
     lfs f2, 0x18(textprop)      # stretch Y (30)
-    branchl r12, 0x803a7548
+    branchl r12, Text_UpdateSubtextSize
 
     b Exit
 
@@ -230,7 +176,7 @@ ShiftQueue:
     beq ShiftQueue_CheckForOneWindowOnly
 
     # Remove Message
-    branchl r12, 0x803a5cc4
+    branchl r12, Text_RemoveText
 
     # Zero Out Entry
     mulli r4, r31, 0x8
@@ -315,7 +261,7 @@ CheckForDuplicates_MatchingWindowLoop:
     # Upon Finding a Match
     # Remove This Window
     lwz r3, 0x0(r4)
-    branchl r12, 0x803a5cc4
+    branchl r12, Text_RemoveText
 
     # Zero Out Entry
     mulli r5, r28, 0x8          # Get Message's Offset

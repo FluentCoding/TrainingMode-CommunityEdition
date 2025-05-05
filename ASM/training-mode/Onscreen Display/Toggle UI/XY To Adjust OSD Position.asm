@@ -1,5 +1,5 @@
     # To be inserted at 802360f8
-    .include "../../Globals.s"
+    .include "../../../Globals.s"
     .include "../../../m-ex/Header.s"
 
     .set Text, 30
@@ -20,7 +20,7 @@
     li r3, 4
     branchl r12, Inputs_GetPlayerInstantInputs
 
-    lwz r20, -0x77C0(r13)       # Get Memcard Data
+    lwz r20, MemcardData(r13)       # Get Memcard Data
 
 #############################################
 CheckY:
@@ -78,7 +78,7 @@ UpdateText:
     beql OSDPositionTextTop
     mflr r6
 
-    branchl r12, 0x803a70a0
+    branchl r12, Text_UpdateSubtextContents
 
     b PlaySFX
 
@@ -108,7 +108,7 @@ OSDPositionTextTop:
 
 PlaySFX:
     li r3, 2
-    branchl r12, 0x80024030
+    branchl r12, SFX_MenuCommonSound
 
 exit:
     restore

@@ -1,5 +1,5 @@
     # To be inserted at 8015cf60
-    .include "../../../Globals.s"
+    .include "../../../../Globals.s"
     .include "../../../../m-ex/Header.s"
 
 # r3 = event

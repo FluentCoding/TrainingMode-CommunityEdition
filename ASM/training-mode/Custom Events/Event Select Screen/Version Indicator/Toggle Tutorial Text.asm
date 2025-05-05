@@ -1,5 +1,5 @@
     # To be inserted at 8024d84c
-    .include "../../../Globals.s"
+    .include "../../../../Globals.s"
     .include "../../../../m-ex/Header.s"
 
     .set MainTextOffset, -0x4EB4

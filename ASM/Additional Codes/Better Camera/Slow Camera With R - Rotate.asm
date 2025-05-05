@@ -1,6 +1,6 @@
     # to be inserted at 80227ac4
 
-    .include "../../training-mode/Globals.s"
+    .include "../../Globals.s"
     .include "../../m-ex/Header.s"
 
     backupall

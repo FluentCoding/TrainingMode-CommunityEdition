@@ -30,6 +30,7 @@ enum menu_options
     OPT_INV,
     OPT_SPEED,
     OPT_OVERLAYS,
+    OPT_RESETDELAY,
     OPT_ABOUT,
     OPT_EXIT,
 };
@@ -60,6 +61,9 @@ static char **LdshOptions_Overlays[] = {"Off", "On"};
 static float LdshOptions_GameSpeeds[] = {1.f, 5.f/6.f, 2.f/3.f, 1.f/2.f, 1.f/4.f};
 static char *LdshOptions_GameSpeedText[] = {"1", "5/6", "2/3", "1/2", "1/4"};
 static char *LdshOptions_Reset[] = {"None", "Same Side", "Swap", "Swap on Success", "Random"};
+static char *LdshOptions_ResetDelay[] = {"Slow", "Normal", "Fast", "Instant"};
+static int LdshOptions_ResetDelaySuccess[] = { 120, 60, 30, 1 };
+static int LdshOptions_ResetDelayFailure[] = { 60, 20, 1, 1 };
 
 static EventOption LdshOptions_Main[] = {
     {
@@ -77,7 +81,6 @@ static EventOption LdshOptions_Main[] = {
         .option_name = "Reset",
         .desc = "Change where the fighter gets placed\nafter a ledgedash attempt.",
         .option_values = LdshOptions_Reset,
-        .onOptionChange = Ledgedash_ToggleAutoReset,
     },
     {
         .option_kind = OPTKIND_STRING,
@@ -122,6 +125,14 @@ static EventOption LdshOptions_Main[] = {
         .option_name = "Color Overlays",
         .desc = "Show which state you are in with a color overlay.",
         .option_values = LdshOptions_Overlays,
+    },
+    {
+        .option_kind = OPTKIND_STRING,
+        .value_num = sizeof(LdshOptions_ResetDelay) / sizeof(*LdshOptions_ResetDelay),
+        .option_val = 1,
+        .option_name = "Reset Delay",
+        .desc = "Change how quickly you can start a new ledgedash.",
+        .option_values = LdshOptions_ResetDelay,
     },
     {
         .option_kind = OPTKIND_FUNC,
@@ -199,8 +210,6 @@ void Event_Init(GOBJ *gobj)
     Ledgedash_FtInit(event_data);
 
     Fighter_PlaceOnLedge();
-
-    return;
 }
 // Think Function
 void Event_Think(GOBJ *event)
@@ -261,9 +270,6 @@ void Event_Think(GOBJ *event)
             hmn_data->color[1].color_enable = 1;
         }
     }
-
-
-    return;
 }
 void Event_Exit()
 {
@@ -274,8 +280,6 @@ void Event_Exit()
 
     // cleanup
     Match_EndVS();
-
-    return;
 }
 
 // Ledgedash functions
@@ -415,7 +419,7 @@ void Ledgedash_HUDThink(LedgedashData *event_data, FighterData *hmn_data)
             action = LDACT_AIRDODGE;
 
         // look for attack
-        else if (hmn_data->atk_kind != 1)
+        else if (hmn_data->atk_kind != 1 || state_id == ASID_CATCH || state_id == ASID_CATCHDASH)
             action = LDACT_ATTACK;
 
         // look for landing
@@ -549,16 +553,12 @@ void Ledgedash_HUDThink(LedgedashData *event_data, FighterData *hmn_data)
 
     // update HUD anim
     JOBJ_AnimAll(hud_jobj);
-
-    return;
 }
 void Ledgedash_HUDCamThink(GOBJ *gobj)
 {
     // if HUD enabled and not paused
     if (LdshOptions_Main[OPT_HUD].option_val == 0 && Pause_CheckStatus(1) != 2)
         CObjThink_Common(gobj);
-
-    return;
 }
 
 void Ledgedash_ResetThink(LedgedashData *event_data, GOBJ *hmn)
@@ -597,7 +597,9 @@ void Ledgedash_ResetThink(LedgedashData *event_data, GOBJ *hmn)
 
         Fighter_PlaceOnLedge();
     } else if (event_data->action_state.is_finished) {
-        event_data->reset_timer = 60;
+        
+        int reset_idx = LdshOptions_Main[OPT_RESETDELAY].option_val;
+        event_data->reset_timer = LdshOptions_ResetDelaySuccess[reset_idx];
         if (event_data->was_successful)
             SFX_Play(303);
         else
@@ -616,13 +618,12 @@ void Ledgedash_ResetThink(LedgedashData *event_data, GOBJ *hmn)
             && hmn_data->TM.state_frame >= 12;
 
         if (dead || missed_airdodge || ledge_action || non_landing_grounded) {
-            event_data->reset_timer = 20;
+            int reset_idx = LdshOptions_Main[OPT_RESETDELAY].option_val;
+            event_data->reset_timer = LdshOptions_ResetDelayFailure[reset_idx];
             event_data->was_successful = false;
             SFX_PlayCommon(3);
         }
     }
-
-    return;
 }
 void Ledgedash_InitVariables(LedgedashData *event_data)
 {
@@ -647,22 +648,6 @@ void Ledgedash_ToggleStartPosition(GOBJ *menu_gobj, int value)
     LedgedashData *event_data = event_vars->event_gobj->userdata;
 
     Fighter_PlaceOnLedge();
-
-    return;
-}
-void Ledgedash_ToggleAutoReset(GOBJ *menu_gobj, int value)
-{
-
-    LedgedashData *event_data = event_vars->event_gobj->userdata;
-
-    // enable camera
-    if (value == OPTRESET_NONE)
-        event_data->cam->kind = 0;
-    // disable camera
-    else
-        event_data->cam->kind = 1;
-
-    return;
 }
 
 // Hitlog functions
@@ -745,8 +730,6 @@ void Ledgedash_HitLogThink(LedgedashData *event_data, GOBJ *hmn)
             this_item = this_item->next;
         }
     }
-
-    return;
 }
 void Ledgedash_HitLogGX(GOBJ *gobj, int pass)
 {
@@ -775,8 +758,6 @@ void Ledgedash_HitLogGX(GOBJ *gobj, int pass)
 
         Develop_DrawSphere(this_ldsh_hit->size, &this_ldsh_hit->pos_curr, &this_ldsh_hit->pos_prev, diffuse, &hitlog_ambient);
     }
-
-    return;
 }
 
 // Fighter fuctions
@@ -804,8 +785,6 @@ void Ledgedash_FtInit(LedgedashData *event_data)
     //    event_data->cam->is_disable = 0;
     //    event_vars->Tip_Display(500 * 60, "Error:\nIt appears there are no\ngood ledges on this stage...");
     //}
-
-    return;
 }
 
 void Ledgedash_ChangeCamMode(GOBJ *menu_gobj, int value)
@@ -834,8 +813,6 @@ void Ledgedash_ChangeCamMode(GOBJ *menu_gobj, int value)
         Match_SetDevelopCamera();
     }
     Match_CorrectCamera();
-
-    return;
 }
 
 void Event_Update()
@@ -896,8 +873,6 @@ void Update_Camera()
             }
         }
     }
-
-    return;
 }
 
 int Ledge_Find(int search_dir, float xpos_start, float *ledge_dir)
@@ -1231,8 +1206,6 @@ void Fighter_PlaceOnLedge(void)
 
         gobj = gobj_next;
     }
-
-    return;
 }
 void Fighter_UpdatePosition(GOBJ *fighter)
 {
@@ -1261,7 +1234,6 @@ void Fighter_UpdatePosition(GOBJ *fighter)
 
     // Update Static Player Block Coords
     Fighter_SetPosition(fighter_data->ply, fighter_data->flags.ms, &fighter_data->phys.pos);
-    return;
 }
 void Fighter_UpdateCamera(GOBJ *fighter)
 {
@@ -1288,8 +1260,6 @@ void RebirthWait_Phys(GOBJ *fighter)
 
     // infinite time
     fighter_data->state_var.state_var1 = 2;
-
-    return;
 }
 int RebirthWait_IASA(GOBJ *fighter)
 {
@@ -1350,8 +1320,6 @@ void Tips_Toggle(GOBJ *menu_gobj, int value)
     // destroy existing tips when disabling
     if (value == 1)
         event_vars->Tip_Destroy();
-
-    return;
 }
 void Tips_Think(LedgedashData *event_data, FighterData *hmn_data)
 {

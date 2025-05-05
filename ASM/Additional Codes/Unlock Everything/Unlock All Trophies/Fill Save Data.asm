@@ -2,7 +2,7 @@
     .include "../../../Globals.s"
 
     # Get trophy data
-    lwz r3, -0x77C0(r13)
+    lwz r3, MemcardData(r13)
     addi r3, r3, 7376
     # Set trophy count
     li r4, 293

@@ -71,7 +71,7 @@ Assert:
     mr r4, r3
     bl ErrorString
     mflr r3
-    branchl r12, 0x803456a8
+    branchl r12, OSReport
     # Assert
     bl Assert_Name
     mflr r3

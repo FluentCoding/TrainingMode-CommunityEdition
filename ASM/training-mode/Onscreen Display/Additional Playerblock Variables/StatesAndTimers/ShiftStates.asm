@@ -1,5 +1,5 @@
     # To be inserted at 800693ec
-    .include "../../../Globals.s"
+    .include "../../../../Globals.s"
     .include "../../../../m-ex/Header.s"
 
 # Store Previous AS + Reset AS Frame Count Timer

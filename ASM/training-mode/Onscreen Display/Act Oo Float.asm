@@ -1,6 +1,6 @@
     # To be inserted at 8011bebc
 
-    .include "../Globals.s"
+    .include "../../Globals.s"
     .include "../../m-ex/Header.s"
 
     .set playerdata, 31
@@ -9,7 +9,7 @@
 
     # CHECK IF ENABLED
     li r0, OSD.FighterSpecificTech
-    lwz r4, -0x77C0(r13)
+    lwz r4, MemcardData(r13)
     lwz r4, 0x1F24(r4)
     li r3, 1
     slw r0, r3, r0

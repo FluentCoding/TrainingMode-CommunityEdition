@@ -116,7 +116,7 @@
 
 SubactionStart:
     mr r3, REG_GObj
-    branchl r12, 0x800c0408             # update colanims
+    branchl r12, GFX_UpdatePlayerGFX             # update colanims
     mr r3, REG_GObj
     branchl r12, 0x80073240             # update subaction unk
     b SubactionEnd
@@ -148,7 +148,7 @@ NoMoveLogic:
     lwz r4, OFST_KirbyHatFileNames(rtoc)
     mulli r5, REG_AbilityID, 8
     lwzx r4, r4, r5
-    branchl r12, 0x803456a8
+    branchl r12, OSReport
     b Assert
 
 NoMoveLogicString:
@@ -165,7 +165,7 @@ NoFtCmd:
     lwz r4, OFST_KirbyHatFileNames(rtoc)
     mulli r5, REG_AbilityID, 8
     lwzx r4, r4, r5
-    branchl r12, 0x803456a8
+    branchl r12, OSReport
     b Assert
 
 NoFtCmdString:
@@ -183,7 +183,7 @@ NoAnim:
     mulli r5, REG_AbilityID, 8
     lwzx r4, r4, r5
     mr r5, REG_State
-    branchl r12, 0x803456a8
+    branchl r12, OSReport
     b Assert
 
 NoAnimString:
@@ -198,7 +198,7 @@ NotKirby:
     bl NotKirbyString
     mflr r3
     lwz r4, 0x4(REG_FighterData)
-    branchl r12, 0x803456a8
+    branchl r12, OSReport
     b Assert
 
 NotKirbyString:

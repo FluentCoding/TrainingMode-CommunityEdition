@@ -1,5 +1,5 @@
     # To be inserted at 80264578
-    .include "../../../Globals.s"
+    .include "../../../../Globals.s"
     .include "../../../../m-ex/Header.s"
 
     backup
@@ -183,7 +183,7 @@ GetCharacterList:
     .set PageID, 30
 
     # Get Hovered Over Event ID in r23
-    lwz r4, -0x77C0(r13)
+    lwz r4, MemcardData(r13)
     lbz EventID, 0x0535(r4)
     # Get Current Page
     lbz PageID, CurrentEventPage(r4)
@@ -211,7 +211,7 @@ GetCharacterList_Loop:
     beq GetCharacterList_Failed
     cmpw r3, EventID
     beq GetCharacterList_Success
-    addi r6, r6, 0x9
+    addi r6, r6, 0x5
     b GetCharacterList_Loop
 
 GetCharacterList_Failed:

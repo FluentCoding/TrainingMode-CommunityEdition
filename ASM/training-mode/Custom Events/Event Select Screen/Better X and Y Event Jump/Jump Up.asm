@@ -1,5 +1,5 @@
     # To be inserted at 8024dabc
-    .include "../../../Globals.s"
+    .include "../../../../Globals.s"
     .include "../../../../m-ex/Header.s"
 
     .set EventID, 31
@@ -52,7 +52,7 @@ UpdateText:
 UpdateText1:
     # Play SFX and Update Text
     li r3, 2
-    branchl r12, 0x80024030
+    branchl r12, SFX_MenuCommonSound
     restore
     branch r12, 0x8024daf8
 

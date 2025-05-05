@@ -1,9 +1,9 @@
     # To be inserted at 801baa98
-    .include "../../../Globals.s"
+    .include "../../../../Globals.s"
     .include "../../../../m-ex/Header.s"
 
     # Get Backup Location
-    lwz r9, -0x77C0(r13)
+    lwz r9, MemcardData(r13)
     addi r9, r9, 3344
     # Restore HMN Character Choice
     load r3, 0x80497758     # CSS Match Info
@@ -17,7 +17,7 @@
     branchl r12, 0x801b06b0
 
     # Get Backup Location
-    lwz r9, -0x77C0(r13)
+    lwz r9, MemcardData(r13)
     addi r9, r9, 3344
     # Backup CPU Character Choice
     load r3, 0x80497758     # CSS Match Info

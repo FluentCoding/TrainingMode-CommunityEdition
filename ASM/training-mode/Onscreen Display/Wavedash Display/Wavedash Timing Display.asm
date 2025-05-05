@@ -1,5 +1,5 @@
     # To be inserted at 80099d7c
-    .include "../../Globals.s"
+    .include "../../../Globals.s"
     .include "../../../m-ex/Header.s"
 
     .set REG_FighterData, 29
@@ -15,7 +15,7 @@
 
     # CHECK IF OSD IS ENABLED
     li r0, OSD.Wavedash             # wavedash ID
-    lwz r4, -0x77C0(r13)
+    lwz r4, MemcardData(r13)
     lwz r4, 0x1F24(r4)
     li r3, 1
     slw r0, r3, r0

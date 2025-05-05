@@ -22,7 +22,7 @@
     # Add SFX ID
     add r3, r3, REG_SFXID
     # Play SFX
-    branchl r12, 0x801c53ec
+    branchl r12, SFX_PlaySoundAtFullVolume
 
 Exit:
     restore

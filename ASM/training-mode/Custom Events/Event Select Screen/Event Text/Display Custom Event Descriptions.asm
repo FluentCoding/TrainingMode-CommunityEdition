@@ -1,5 +1,5 @@
     # To be inserted at 8024d80c
-    .include "../../../Globals.s"
+    .include "../../../../Globals.s"
     .include "../../../../m-ex/Header.s"
 
     .set HeaderLength, 0xB
@@ -31,7 +31,7 @@ CustomEvent:
     # Create Text
     li r3, 0
     li r4, 0
-    branchl r12, 0x803a6754
+    branchl r12, Text_CreateTextStruct
     mr text, r3
     # Store pointer to text so it can be removed by the game
     stw text, 0x78(r31)
@@ -110,14 +110,14 @@ NoAdjustAllocation:
     bl DescriptionHeader
     mflr r4
     li r5, HeaderLength
-    branchl r12, 0x800031f4
+    branchl r12, memcpy
 
     # Copy Text to Text Allocation
     mr r5, r20                  # Length
     lwz r3, 0x5C(text)          # Get Pointer to Next Available Menu Text Location
     addi r3, r3, HeaderLength   # Skip Past Header
     addi r4, sp, 0x40
-    branchl r12, 0x800031f4
+    branchl r12, memcpy
 
     # Add Terminator
     li r3, 0x1900

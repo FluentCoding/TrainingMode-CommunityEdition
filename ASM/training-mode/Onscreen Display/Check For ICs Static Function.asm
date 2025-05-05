@@ -18,7 +18,7 @@
 
     # Check If Follower
     lbz r3, 0xC(playerdata) # get slot
-    branchl r12, 0x80032330 # get external character ID
+    branchl r12, PlayerBlock_LoadExternalCharID # get external character ID
     load r4, 0x803bcde0     # pdLoadCommonData table
     mulli r0, r3, 3         # struct length
     add r3, r4, r0          # get characters entry

@@ -1,12 +1,6 @@
     # To be inserted at 80005508
-    .include "../../Globals.s"
+    .include "../../../Globals.s"
     .include "../../../m-ex/Header.s"
-
-    .set ActionStateChange, 0x800693ac
-    .set HSD_Randi, 0x80380580
-    .set HSD_Randf, 0x80380528
-    .set Wait, 0x8008a348
-    .set Fall, 0x800cc730
 
     .set REG_FighterData, 31
     .set player, 30
@@ -31,7 +25,7 @@
     # CHECK IF ENABLED
     li r0, OSD.ActOoS                           # wavedash ID
     # lwz r4, -0xdbc(rtoc) #get frame data toggle bits
-    lwz r4, -0x77C0(r13)
+    lwz r4, MemcardData(r13)
     lwz r4, 0x1F24(r4)
     li r5, 1
     slw r0, r5, r0

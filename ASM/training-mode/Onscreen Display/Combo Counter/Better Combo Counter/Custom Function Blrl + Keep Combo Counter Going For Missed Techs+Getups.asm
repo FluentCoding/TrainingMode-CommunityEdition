@@ -1,5 +1,5 @@
     # To be inserted at 8006ab88
-    .include "../../../Globals.s"
+    .include "../../../../Globals.s"
     .include "../../../../m-ex/Header.s"
 
     .set entity, 31

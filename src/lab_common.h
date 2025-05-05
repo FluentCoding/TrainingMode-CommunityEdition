@@ -429,6 +429,8 @@ void Lab_ChangeSlot4ChanceCPU (GOBJ *menu_gobj, int _new_val);
 void Lab_ChangeSlot5ChanceCPU (GOBJ *menu_gobj, int _new_val);
 void Lab_ChangeSlot6ChanceCPU (GOBJ *menu_gobj, int _new_val);
 void DIDraw_GX();
+void Record_CopySlot(GOBJ *menu_gobj);
+void Record_DeleteSlot(GOBJ *menu_gobj);
 void Record_ChangeHMNSlot(GOBJ *menu_gobj, int value);
 void Record_ChangeCPUSlot(GOBJ *menu_gobj, int value);
 void Record_ChangeHMNMode(GOBJ *menu_gobj, int value);

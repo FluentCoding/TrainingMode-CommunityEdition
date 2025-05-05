@@ -1,7 +1,7 @@
     # To be inserted at 800d8b58
     # Just after determining to start a boost grab in Interrupt_Grab_FromDashAttack
 
-    .include "../Globals.s"
+    .include "../../Globals.s"
     .include "../../m-ex/Header.s"
 
     .set playerdata, 31
@@ -11,7 +11,7 @@
 
     # CHECK IF ENABLED
     li r0, OSD.BoostGrab
-    lwz r4, -0x77C0(r13)
+    lwz r4, MemcardData(r13)
     lwz r4, 0x1F24(r4)
     li r3, 1
     slw r0, r3, r0

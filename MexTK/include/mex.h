@@ -286,8 +286,11 @@ void MEX_RelocRelArchive(void *xFunction);
 int SFX_PlayStageSFX(int sfx_id); // use index relative to the ssm (start at 0)
 void *calloc(int size);
 void bp();
+
+// see https://smashboards.com/threads/primitive-drawing-module.454232/
 PRIM *PRIM_NEW(int vert_count, int params1, int params2);
 void PRIM_CLOSE();
+
 MEXPlaylist *MEX_GetPlaylist();
 void *MEX_GetKirbyCpData(int copy_id);
 void *MEX_GetData(int index);

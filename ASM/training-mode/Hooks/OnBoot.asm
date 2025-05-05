@@ -1,5 +1,5 @@
     # To be inserted at 801bfa28
-    .include "../Globals.s"
+    .include "../../Globals.s"
     .include "../../m-ex/Header.s"
 
     # Call function in TmDt

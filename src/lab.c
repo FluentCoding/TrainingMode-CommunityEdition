@@ -63,6 +63,76 @@ static bool did_player_miss_lcancel[2] = {false, false};
 
 // Menu Callbacks
 
+RecInputData *Lab_GetAlteringRecording(void) {
+    int ply = LabOptions_SlotManagement[OPTSLOT_PLAYER].option_val;
+    int slot = LabOptions_SlotManagement[OPTSLOT_SRC].option_val;
+    int frame_idx = LabOptions_AlterInputs[OPTINPUT_FRAME].option_val - 1;
+    RecInputData **rec_list = ply == PLAYER_HMN ? rec_data.hmn_inputs : rec_data.cpu_inputs;
+    return rec_list[slot];
+}
+
+RecInputs *Lab_GetAlteringInputs(void) {
+    RecInputData *rec = Lab_GetAlteringRecording();
+    int frame_idx = LabOptions_AlterInputs[OPTINPUT_FRAME].option_val - 1;
+    return &rec->inputs[frame_idx];
+}
+
+void Lab_ChangeAlterInputsFrame(GOBJ *menu_gobj, int value) {
+    Lab_SetAlterInputsMenuOptions(menu_gobj);
+}
+
+int Lab_SetAlterInputsMenuOptions(GOBJ *menu_gobj) {
+    RecInputData *rec = Lab_GetAlteringRecording();
+    int frame = LabOptions_AlterInputs[OPTINPUT_FRAME].option_val;
+    if (rec->num < frame)
+        rec->num = frame;
+
+    RecInputs *inputs = Lab_GetAlteringInputs();
+    LabOptions_AlterInputs[OPTINPUT_LSTICK_X].option_val = inputs->stickX;
+    LabOptions_AlterInputs[OPTINPUT_LSTICK_Y].option_val = inputs->stickY;
+    LabOptions_AlterInputs[OPTINPUT_CSTICK_X].option_val = inputs->substickX;
+    LabOptions_AlterInputs[OPTINPUT_CSTICK_Y].option_val = inputs->substickY;
+    LabOptions_AlterInputs[OPTINPUT_TRIGGER].option_val  = inputs->trigger;
+    LabOptions_AlterInputs[OPTINPUT_A].option_val        = inputs->btn_a;
+    LabOptions_AlterInputs[OPTINPUT_B].option_val        = inputs->btn_b;
+    LabOptions_AlterInputs[OPTINPUT_X].option_val        = inputs->btn_x;
+    LabOptions_AlterInputs[OPTINPUT_Y].option_val        = inputs->btn_y;
+    LabOptions_AlterInputs[OPTINPUT_L].option_val        = inputs->btn_L;
+    LabOptions_AlterInputs[OPTINPUT_R].option_val        = inputs->btn_R;
+    LabOptions_AlterInputs[OPTINPUT_Z].option_val        = inputs->btn_Z;
+    return 1;
+}
+
+void Lab_ChangeInputs(GOBJ *menu_gobj, int value) {
+    RecInputs *inputs = Lab_GetAlteringInputs();
+    inputs->stickX    = LabOptions_AlterInputs[OPTINPUT_LSTICK_X].option_val;
+    inputs->stickY    = LabOptions_AlterInputs[OPTINPUT_LSTICK_Y].option_val;
+    inputs->substickX = LabOptions_AlterInputs[OPTINPUT_CSTICK_X].option_val;
+    inputs->substickY = LabOptions_AlterInputs[OPTINPUT_CSTICK_Y].option_val;
+    inputs->trigger   = LabOptions_AlterInputs[OPTINPUT_TRIGGER].option_val;
+    inputs->btn_a     = LabOptions_AlterInputs[OPTINPUT_A].option_val;
+    inputs->btn_b     = LabOptions_AlterInputs[OPTINPUT_B].option_val;
+    inputs->btn_x     = LabOptions_AlterInputs[OPTINPUT_X].option_val;
+    inputs->btn_y     = LabOptions_AlterInputs[OPTINPUT_Y].option_val;
+    inputs->btn_L     = LabOptions_AlterInputs[OPTINPUT_L].option_val;
+    inputs->btn_R     = LabOptions_AlterInputs[OPTINPUT_R].option_val;
+    inputs->btn_Z     = LabOptions_AlterInputs[OPTINPUT_Z].option_val;
+}
+
+void Lab_ChangeAdvCounterHitNumber(GOBJ *menu_gobj, int value) {
+    // copy current hit number to all options 
+    for (int i = 0; i < ADV_COUNTER_COUNT; ++i)
+        LabOptions_AdvCounter[i][OPTCTR_HITNUM].option_val = value;
+    LabMenu_AdvCounter.options = LabOptions_AdvCounter[value - 1];
+}
+
+void Lab_ChangeAdvCounterLogic(GOBJ *menu_gobj, int value) {
+    int disable = value != CTRLOGIC_CUSTOM;
+    EventOption *options = LabMenu_AdvCounter.options;
+    for (int i = OPTCTR_CTRGRND; i < OPTCTR_COUNT; ++i)
+        options[i].disable = disable;
+}
+
 void Lab_AddCustomOSD(GOBJ *menu_gobj) {
     int row = OPTCUSTOMOSD_FIRST_CUSTOM + stc_custom_osd_state_num;
     if (row == OPTCUSTOMOSD_MAX_COUNT) {
@@ -196,8 +266,6 @@ void Lab_ChangePlayerPercent(GOBJ *menu_gobj, int value)
         hmn_locked_percent = fighter_data->dmg.percent;
 
     Fighter_SetHUDDamage(0, value);
-
-    return;
 }
 void Lab_ChangePlayerLockPercent(GOBJ *menu_gobj, int value)
 {
@@ -206,8 +274,6 @@ void Lab_ChangePlayerLockPercent(GOBJ *menu_gobj, int value)
 
     if (value)
         hmn_locked_percent = fighter_data->dmg.percent;
-
-    return;
 }
 
 void Lab_StartMoveCPU(GOBJ *menu_gobj) {
@@ -247,8 +313,6 @@ void Lab_ChangeFrameAdvance(GOBJ *menu_gobj, int value)
     // apply colanim
     else
         LabOptions_General[OPTGEN_FRAMEBTN].disable = 0;
-
-    return;
 }
 
 void Lab_ChangeFrameAdvanceButton(GOBJ *menu_gobj, int value) {
@@ -265,8 +329,6 @@ void Lab_ChangeRandom(GOBJ *menu_gobj, int value)
     // apply colanim
     else
         LabOptions_General[OPTGEN_FRAMEBTN].disable = 0;
-
-    return;
 }
 void Lab_ChangeCPUPercent(GOBJ *menu_gobj, int value)
 {
@@ -278,8 +340,6 @@ void Lab_ChangeCPUPercent(GOBJ *menu_gobj, int value)
 
     if (LabOptions_CPU[OPTCPU_LOCKPCNT].option_val)
         cpu_locked_percent = fighter_data->dmg.percent;
-
-    return;
 }
 void Lab_ChangeCPULockPercent(GOBJ *menu_gobj, int value)
 {
@@ -289,8 +349,6 @@ void Lab_ChangeCPULockPercent(GOBJ *menu_gobj, int value)
 
     if (value)
         cpu_locked_percent = fighter_data->dmg.percent;
-
-    return;
 }
 void Lab_ChangeTech(GOBJ *menu_gobj, int value)
 {
@@ -387,8 +445,6 @@ void Lab_ChangeCPUIntang(GOBJ *menu_gobj, int value)
         Fighter_ColAnim_Remove(fighter_data, INTANG_COLANIM);
     else
         Fighter_ColAnim_Apply(fighter_data, INTANG_COLANIM, 0);
-
-    return;
 }
 
 void Lab_ChangeModelDisplay(GOBJ *menu_gobj, int value)
@@ -417,8 +473,6 @@ void Lab_ChangeModelDisplay(GOBJ *menu_gobj, int value)
     bool hide_misc = hide_stage || hide_chars;
 
     stc_matchcam->hide_effects = hide_misc;
-
-    return;
 }
 void Lab_ChangeHitDisplay(GOBJ *menu_gobj, int value)
 {
@@ -435,13 +489,10 @@ void Lab_ChangeHitDisplay(GOBJ *menu_gobj, int value)
         // get next fighter
         this_fighter = this_fighter->next;
     }
-
-    return;
 }
 void Lab_ChangeEnvCollDisplay(GOBJ *menu_gobj, int value)
 {
     stc_matchcam->show_coll = value;
-    return;
 }
 void Lab_ChangeItemGrabDisplay(GOBJ *menu_gobj, int value)
 {
@@ -479,8 +530,6 @@ void Lab_ChangeCamMode(GOBJ *menu_gobj, int value)
         Match_SetDevelopCamera();
     }
     Match_CorrectCamera();
-
-    return;
 }
 
 static void Lab_ChangeInfoPreset(EventOption options[], int preset_id)
@@ -520,11 +569,6 @@ void Lab_Exit(int value)
 
     // cleanup
     Match_EndVS();
-
-    // Unfreeze
-    LabOptions_General[OPTGEN_FRAME].option_val = 0;
-    //HSD_Update *update = stc_hsd_update;
-    return;
 }
 
 // Event Functions
@@ -1411,11 +1455,9 @@ void CPUResetVars(void) {
     eventData->cpu_hitshield = 0;
     eventData->cpu_hitnum = 0;
     eventData->cpu_countertimer = 0;
-    eventData->cpu_hitshield = 0;
     eventData->cpu_lasthit = -1;
     eventData->cpu_lastshieldstun = -1;
     eventData->cpu_hitkind = -1;
-    eventData->cpu_hitshieldnum = 0;
     eventData->cpu_isactionable = 0;
     eventData->cpu_sdinum = 0;
     eventData->cpu_miss_tech_wait_timer = 0;
@@ -1501,7 +1543,7 @@ void CPUThink(GOBJ *event, GOBJ *hmn, GOBJ *cpu)
         if (eventData->cpu_lastshieldstun != cpu_data->atk_instance)
         {
             eventData->cpu_lastshieldstun = cpu_data->atk_instance;
-            eventData->cpu_hitshieldnum++;
+            eventData->cpu_hitnum++;
         }
 
         // Keep holding shield during hitstop/hitlag. Prevents nana from dropping shield.
@@ -1955,6 +1997,11 @@ void CPUThink(GOBJ *event, GOBJ *hmn, GOBJ *cpu)
 
         switch (asdi_kind)
         {
+            case (ASDI_NONE):
+            {
+                // follow TDI, or custom SDI
+                break;
+            }
             case (ASDI_AUTO):
             {
                 // follow TDI, or custom SDI
@@ -2256,72 +2303,37 @@ void CPUThink(GOBJ *event, GOBJ *hmn, GOBJ *cpu)
             if (eventData->cpu_groundstate == 0 && cpu_data->phys.air_state == 1)
                 eventData->cpu_groundstate = 1;
         }
-
-        int action_id;
+        
         if (
-            eventData->cpu_hitkind == HITKIND_DAMAGE
+            eventData->cpu_hitkind != HITKIND_DAMAGE
+            && eventData->cpu_hitkind != HITKIND_SHIELD 
 
             // Additional check for countering on grab release
-            || last_state == ASID_CAPTURECUT || last_state == ASID_CAPTUREJUMP
+            && last_state != ASID_CAPTURECUT 
+            && last_state != ASID_CAPTUREJUMP
         ) {
-            // ensure hit count and frame count criteria are met
-            int min_hitnum = LabOptions_CPU[OPTCPU_CTRHITS].option_val;
-            int counter_delay = LabOptions_CPU[OPTCPU_CTRFRAMES].option_val;
-
-            if (eventData->cpu_hitnum < min_hitnum || eventData->cpu_countertimer < counter_delay) {
-                break;
-            }
-
-            if (eventData->cpu_groundstate == 0)
-            {
-                int grndCtr = LabOptions_CPU[OPTCPU_CTRGRND].option_val;
-                action_id = CPUCounterActionsGround[grndCtr];
-            }
-            else
-            {
-                int airCtr = LabOptions_CPU[OPTCPU_CTRAIR].option_val;
-                action_id = CPUCounterActionsAir[airCtr];
-            }
-        }
-        else if (eventData->cpu_hitkind == HITKIND_SHIELD)
-        {
-
-            // if the shield wasnt hit enough times, return to start
-            if (eventData->cpu_hitshieldnum < LabOptions_CPU[OPTCPU_SHIELDHITS].option_val)
-            {
-                eventData->cpu_state = CPUSTATE_START;
-                goto CPULOGIC_START;
-                break;
-            }
-
-            // if this isnt the frame to counter, keep holding shield
-            if (eventData->cpu_countertimer < LabOptions_CPU[OPTCPU_CTRFRAMES].option_val)
-            {
-                cpu_data->cpu.held = PAD_TRIGGER_R;
-                break;
-            }
-
-            // get action to perform
-            int shieldCtr = LabOptions_CPU[OPTCPU_CTRSHIELD].option_val;
-            action_id = CPUCounterActionsShield[shieldCtr];
-        }
-        else
-        {
             // wasnt hit, fell or something idk. enter start again
             goto CPUSTATE_ENTERSTART;
         }
 
-        if (action_id == 0) {
+        CounterInfo info = GetCounterInfo();
+        if (info.disable)
+            goto CPULOGIC_START;
+        
+        // run counter logic
+        if (info.action_id == 0) {
             eventData->cpu_state = CPUSTATE_NONE;
             goto CPULOGIC_NONE;
         } else {
             eventData->cpu_countering = true;
-            if (Lab_CPUPerformAction(cpu, action_id, hmn)) {
-                CPUAction *action = Lab_CPUActions[action_id];
-                if (action->noActAfter)
+            if (Lab_CPUPerformAction(cpu, info.action_id, hmn)) {
+                CPUAction *action = Lab_CPUActions[info.action_id];
+                if (action->noActAfter) {
                     eventData->cpu_state = CPUSTATE_NONE;
-                else
+                    goto CPULOGIC_NONE;
+                } else {
                     eventData->cpu_state = CPUSTATE_RECOVER;
+                }
             }
         }
 
@@ -2412,10 +2424,29 @@ int Update_CheckPause()
     // menu unpaused
     else
     {
-        // check if paused
-        if (update->pause_kind == PAUSEKIND_SYS)
+        if (LabOptions_Record[OPTREC_STARTPAUSED].option_val && Record_GetCurrFrame() == 0)
         {
-            // unpause
+            GOBJ *hmn = Fighter_GetGObj(0);
+            FighterData *hmn_data = hmn->userdata;
+            HSD_Pad *pad = PadGet(hmn_data->pad_index, PADGET_MASTER);
+            
+            int input = false;
+            int buttons = PAD_TRIGGER_Z | PAD_TRIGGER_L | PAD_TRIGGER_R
+                | PAD_BUTTON_A | PAD_BUTTON_B | PAD_BUTTON_X | PAD_BUTTON_Y;  
+            input |= (pad->held & buttons) != 0; 
+            input |= fabs(pad->fstickX) >= STICK_DEADZONE; 
+            input |= fabs(pad->fstickY) >= STICK_DEADZONE; 
+            input |= fabs(pad->fsubstickX) >= STICK_DEADZONE; 
+            input |= fabs(pad->fsubstickY) >= STICK_DEADZONE; 
+            input |= pad->ftriggerLeft >= 0.1;
+            input |= pad->ftriggerRight >= 0.1;
+            
+            if (update->pause_kind == PAUSEKIND_SYS) {
+                isChange = input;
+            } else {
+                isChange = !input;
+            }
+        } else if (update->pause_kind == PAUSEKIND_SYS) {
             isChange = 1;
         }
     }
@@ -2498,8 +2529,6 @@ void DIDraw_Init()
             didraws[i].vertices[j] = 0;
         }
     }
-
-    return;
 }
 void DIDraw_Update()
 {
@@ -2906,8 +2935,6 @@ void DIDraw_Update()
             }
         }
     }
-
-    return;
 }
 void DIDraw_GX()
 {
@@ -2943,7 +2970,6 @@ void DIDraw_GX()
             }
         }
     }
-    return;
 }
 void Update_Camera()
 {
@@ -2991,8 +3017,6 @@ void Update_Camera()
             }
         }
     }
-
-    return;
 }
 
 void CustomTDI_Apply(GOBJ *cpu, GOBJ *hmn, CustomTDI *di)
@@ -3129,8 +3153,6 @@ void Lab_SelectCustomTDI(GOBJ *menu_gobj)
     menu_data->custom_gobj = tdi_gobj;
     menu_data->custom_gobj_destroy = CustomTDI_Destroy;
 
-    return;
-
     /*
     // Change color
     GXColor gx_color = TEXT_BGCOLOR;
@@ -3242,8 +3264,6 @@ void CustomTDI_Update(GOBJ *gobj)
 
     // update jobj
     JOBJ_SetMtxDirtySub(gobj->hsd_object);
-
-    return;
 }
 void CustomTDI_Destroy(GOBJ *gobj)
 {
@@ -3273,8 +3293,6 @@ void CustomTDI_Destroy(GOBJ *gobj)
 
     // play sfx
     SFX_PlayCommon(0);
-
-    return;
 }
 void Inputs_Think(GOBJ *gobj)
 {
@@ -3296,14 +3314,6 @@ void Inputs_Think(GOBJ *gobj)
             show[1] = true;
             break;
         }
-    }
-
-    bool input_display = false;
-    for (int i = 0; i < 4; i++) input_display |= show[i];
-    if (!input_display) {
-        Match_ShowTimer();
-    } else {
-        Match_HideTimer();
     }
 
     // update controllers
@@ -3422,10 +3432,10 @@ void Inputs_Init()
     JOBJ *root = JOBJ_LoadJoint(root_desc);
 
     static Vec2 stc_pos[4] = {
-        {5, 20},
-        {15, 20},
-        {5, 10},
-        {15, 10},
+        {13, 20},
+        {23, 20},
+        {13, 10},
+        {23, 10},
     };
 
     int controller_count = 0;
@@ -3458,8 +3468,46 @@ void Inputs_Init()
 
     GObj_AddObject(input_gobj, 3, root);                              // add to gobj
     GObj_AddGXLink(input_gobj, GXLink_Common, INPUT_GXLINK, INPUT_GXPRI); // add gx link
+}
 
-    return;
+void Record_CopySlot(GOBJ *menu_gobj) {
+    int player = LabOptions_SlotManagement[OPTSLOT_PLAYER].option_val;
+    int copy_slot = LabOptions_SlotManagement[OPTSLOT_SRC].option_val;
+    int target_slot = LabOptions_SlotManagement[OPTSLOT_DST].option_val;
+    if (copy_slot == target_slot) return;
+
+    RecInputData **data;
+    EventOption *chances;
+    if (player == PLAYER_HMN) {
+        data = rec_data.hmn_inputs;
+        chances = LabOptions_SlotChancesHMN;
+    } else {
+        data = rec_data.cpu_inputs;
+        chances = LabOptions_SlotChancesCPU;
+    }
+
+    chances[target_slot].disable = chances[copy_slot].disable;
+    rebound_slot_chances(chances, target_slot);
+    memcpy(data[target_slot], data[copy_slot], sizeof(RecInputData));
+}
+
+void Record_DeleteSlot(GOBJ *menu_gobj) {
+    int player = LabOptions_SlotManagement[OPTSLOT_PLAYER].option_val;
+    int delete_slot = LabOptions_SlotManagement[OPTSLOT_SRC].option_val;
+
+    RecInputData **data;
+    EventOption *chances;
+    if (player == PLAYER_HMN) {
+        data = rec_data.hmn_inputs;
+        chances = LabOptions_SlotChancesHMN;
+    } else {
+        data = rec_data.cpu_inputs;
+        chances = LabOptions_SlotChancesCPU;
+    }
+    chances[delete_slot].disable = 1;
+    rebound_slot_chances(chances, delete_slot);
+    data[delete_slot]->start_frame = -1;
+    data[delete_slot]->num = 0;
 }
 
 // Recording Functions
@@ -3582,8 +3630,6 @@ void Record_CObjThink(GOBJ *gobj)
     {
         CObjThink_Common(gobj);
     }
-
-    return;
 }
 void Record_GX(GOBJ *gobj, int pass)
 {
@@ -3675,8 +3721,6 @@ void Record_GX(GOBJ *gobj, int pass)
     }
 
     GXLink_Common(gobj, pass);
-
-    return;
 }
 void Record_Think(GOBJ *rec_gobj)
 {
@@ -3893,8 +3937,6 @@ void Record_Update(int ply, RecInputData *input_data, int rec_mode)
         }
         }
     }
-
-    return;
 }
 void Record_InitState(GOBJ *menu_gobj)
 {
@@ -4253,8 +4295,6 @@ void Record_OnSuccessfulSave(int deleteRecordings)
 
     // take screenshot
     snap_status = 1;
-
-    return;
 }
 void Memcard_Wait()
 {
@@ -4263,8 +4303,6 @@ void Memcard_Wait()
     {
         blr2();
     }
-
-    return;
 }
 void Record_MemcardLoad(int slot, int file_no)
 {
@@ -4407,8 +4445,6 @@ void Record_MemcardLoad(int slot, int file_no)
         int load_post_tick = OSGetTick();
         int load_time = OSTicksToMilliseconds(load_post_tick - load_pre_tick);
     }
-
-    return;
 }
 int Record_MenuThink(GOBJ *menu_gobj)
 {
@@ -4425,10 +4461,7 @@ int Record_MenuThink(GOBJ *menu_gobj)
 }
 void Record_StartExport(GOBJ *menu_gobj)
 {
-
     export_status = EXSTAT_REQSAVE;
-
-    return;
 }
 
 void Record_LoadSavestate(Savestate *savestate) {
@@ -4518,11 +4551,8 @@ void Savestates_Update()
                 HSD_Pad *pad = PadGet(port, PADGET_MASTER);
                 if (pad == NULL) continue; // Skip if no controller in this port
 
-                // check for savestate
-                int blacklist = (HSD_BUTTON_DPAD_DOWN | HSD_BUTTON_DPAD_UP | HSD_TRIGGER_Z | HSD_TRIGGER_R | HSD_BUTTON_A | HSD_BUTTON_B | HSD_BUTTON_X | HSD_BUTTON_Y | HSD_BUTTON_START);
-                
                 // Save state (D-pad right)
-                if ((pad->held & HSD_BUTTON_DPAD_RIGHT) && !(pad->held & blacklist))
+                if (pad->held & HSD_BUTTON_DPAD_RIGHT)
                 {
                     save_timer[port]++;
                     if (save_timer[port] == SAVE_THRESHOLD)
@@ -4540,7 +4570,7 @@ void Savestates_Update()
                 }
 
                 // Load state (D-pad left)
-                if ((pad->down & HSD_BUTTON_DPAD_LEFT) && !(pad->held & blacklist))
+                if (pad->down & HSD_BUTTON_DPAD_LEFT)
                 {
                     // load state
                     Record_LoadSavestate(event_vars->savestate);
@@ -4560,8 +4590,6 @@ void Savestates_Update()
             }
         }
     }
-
-    return;
 }
 
 // Export functions
@@ -4605,12 +4633,9 @@ void ImageScale(RGB565 *out_img, RGB565 *in_img, int OutWidth, int OutHeight, in
             out_img[in_pixel] = in_img[out_pixel];
         }
     }
-
-    return;
 }
 void Export_Init(GOBJ *menu_gobj)
 {
-
     MenuData *menu_data = menu_gobj->userdata;
     EventMenu *curr_menu = menu_data->currMenu;
     evMenu *menuAssets = event_vars->menu_assets;
@@ -4723,8 +4748,6 @@ void Export_Init(GOBJ *menu_gobj)
     menu_data->custom_gobj = export_gobj;            // set custom gobj
     menu_data->custom_gobj_think = Export_Think;     // set think function
     menu_data->custom_gobj_destroy = Export_Destroy; // set destroy function
-
-    return;
 }
 int Export_Think(GOBJ *export_gobj)
 {
@@ -4784,8 +4807,6 @@ void Export_Destroy(GOBJ *export_gobj)
     menu_data->custom_gobj = 0;
     menu_data->custom_gobj_think = 0;
     menu_data->custom_gobj_destroy = 0;
-
-    return;
 }
 void Export_SelCardInit(GOBJ *export_gobj)
 {
@@ -4849,8 +4870,6 @@ void Export_SelCardInit(GOBJ *export_gobj)
     // init cursor
     export_data->menu_index = EXMENU_SELCARD;
     export_data->slot = 0;
-
-    return;
 }
 int Export_SelCardThink(GOBJ *export_gobj)
 {
@@ -5124,8 +5143,6 @@ void Export_EnterNameInit(GOBJ *export_gobj)
     // init menu variables
     export_data->menu_index = EXMENU_NAME;
     export_data->filename_cursor = 0;
-
-    return;
 }
 int Export_EnterNameThink(GOBJ *export_gobj)
 {
@@ -5577,8 +5594,6 @@ void Export_EnterNameUpdateKeyboard(GOBJ *export_gobj)
             Text_SetColor(text_keyboard, this_subtext, color);
         }
     }
-
-    return;
 }
 int Export_Process(GOBJ *export_gobj)
 {
@@ -5849,6 +5864,15 @@ void Event_Init(GOBJ *gobj)
     GObj_AddProc(gobj, Event_PostThink, 20);
 
     // Init runtime options...
+    
+    // advanced counter options
+    for (int i = 0; i < ADV_COUNTER_COUNT; ++i) {
+        memcpy(
+            LabOptions_AdvCounter[i],
+            LabOptions_AdvCounter_Default,
+            sizeof(LabOptions_AdvCounter_Default)
+        );
+    }
 
     // overlays
     memcpy(LabOptions_OverlaysHMN, LabOptions_OverlaysDefault, sizeof(LabOptions_OverlaysDefault));
@@ -5980,8 +6004,6 @@ void Event_Init(GOBJ *gobj)
 
     // Aitch: VERY nice for debugging. Please don't remove.
     TMLOG("HMN: %x\tCPU: %x\n", (u32)hmn_data, (u32)cpu_data);
-
-    return;
 }
 
 // Update Function
@@ -6180,11 +6202,9 @@ void Event_Think_LabState_Normal(GOBJ *event) {
                     eventData->cpu_lasthit = cpu_data->dmg.atk_instance_hurtby;
                     eventData->cpu_hitkind = HITKIND_DAMAGE;
                 }
-
-                int min_hitnum = LabOptions_CPU[OPTCPU_CTRHITS].option_val;
-                int counter_delay = LabOptions_CPU[OPTCPU_CTRFRAMES].option_val;
-
-                if (eventData->cpu_hitnum >= min_hitnum && eventData->cpu_countertimer >= counter_delay) {
+                
+                CounterInfo info = GetCounterInfo();
+                if (!info.disable) {
                     stc_playback_cancelled_cpu = true;
                     eventData->cpu_state = CPUSTATE_COUNTER;
                 } else if (!in_hitstun_anim(cpu) || hitstun_ended(cpu)) {
@@ -6296,7 +6316,7 @@ void Event_Think(GOBJ *event)
     GOBJ *cpu = Fighter_GetGObj(1);
     FighterData *cpu_data = cpu->userdata;
     HSD_Pad *pad = PadGet(hmn_data->pad_index, PADGET_ENGINE);
-
+    
     // We allow negative values to track how long we have not been in lockout for.
     // If the CPU is in hitlag, do not finish the lockout. This prevents insta techs
     // when the tech windows is the 1f between hitlag and knockdown.
@@ -6442,6 +6462,60 @@ void Event_Think(GOBJ *event)
 
         Event_Think_LabState_Normal(event);
     }
+}
+
+CounterInfo GetCounterInfo(void) {
+    LabData *eventData = event_vars->event_gobj->userdata;
+    CounterInfo info = {0};
+    
+    // determine counter logic
+    EventOption *adv_options = NULL;
+    int logic = CTRLOGIC_DEFAULT;
+    
+    int hitidx = eventData->cpu_hitnum - 1;
+    if (hitidx < ADV_COUNTER_COUNT) {
+        adv_options = LabOptions_AdvCounter[hitidx];
+        logic = adv_options[OPTCTR_LOGIC].option_val;
+    }
+                        
+    // find action and delay for this hit
+    if (logic == CTRLOGIC_DEFAULT) {
+        info.counter_delay = LabOptions_CPU[OPTCPU_CTRFRAMES].option_val;
+        
+        if (eventData->cpu_hitkind == HITKIND_SHIELD) {
+            int ctr = LabOptions_CPU[OPTCPU_CTRSHIELD].option_val;
+            info.action_id = CPUCounterActionsShield[ctr];
+        } else if (eventData->cpu_groundstate == 0) {
+            int ctr = LabOptions_CPU[OPTCPU_CTRGRND].option_val;
+            info.action_id = CPUCounterActionsGround[ctr];
+        } else {
+            int ctr = LabOptions_CPU[OPTCPU_CTRAIR].option_val;
+            info.action_id = CPUCounterActionsAir[ctr];
+        }
+    } else if (logic == CTRLOGIC_DISABLED) {
+        info.disable = 1;
+    } else if (logic == CTRLOGIC_CUSTOM) {
+        if (eventData->cpu_hitkind == HITKIND_SHIELD) {
+            info.counter_delay = adv_options[OPTCTR_DELAYSHIELD].option_val;
+            int ctr = adv_options[OPTCTR_CTRSHIELD].option_val;
+            info.action_id = CPUCounterActionsShield[ctr];
+        } else if (eventData->cpu_groundstate == 0) {
+            info.counter_delay = adv_options[OPTCTR_DELAYGRND].option_val;
+            int ctr = adv_options[OPTCTR_CTRGRND].option_val;
+            info.action_id = CPUCounterActionsGround[ctr];
+        } else {
+            info.counter_delay = adv_options[OPTCTR_DELAYAIR].option_val;
+            int ctr = adv_options[OPTCTR_CTRAIR].option_val;
+            info.action_id = CPUCounterActionsAir[ctr];
+        }
+    } else {
+        assert("invalid counter logic");
+    }
+    
+    if (eventData->cpu_countertimer < info.counter_delay)
+        info.disable = 1;
+
+    return info;
 }
 
 // Initial Menu

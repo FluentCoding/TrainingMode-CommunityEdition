@@ -14,7 +14,7 @@
     # clear
     li r4, 0
     mr r5, REG_Size
-    branchl r12, 0x80003100
+    branchl r12, memset
     # Exit
     mr r3, REG_Alloc
     restore

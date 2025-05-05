@@ -1368,7 +1368,7 @@ struct ftCommonData
     float friction_mult;                       // 0x6c
     float jumpaerial_lsticky;                  // 0x70
     int jumpaerial_lsticktimer;                // 0x74
-    float x78;                                 // 0x78
+    float jumpaerial_back_tilt;                // 0x78
     float x7c;                                 // 0x7c
     float x80;                                 // 0x80
     float x84;                                 // 0x84
@@ -2641,7 +2641,7 @@ struct FighterData
         char x2228_5 : 1;                         // 0x08 - 0x2228
         char is_ignore_death3 : 1;                // 0x04 - 0x2228
         char used_tether : 1;                     // 0x02 - 0x2228
-        char x2228_8 : 1;                         // 0x01 - 0x2228
+        char last_lstick_x_dir: 1;                // 0x01 - 0x2228, last stick x direction outside of deadzone. 1 to right, 0 to left.
         unsigned char x2229_1 : 1;                // 0x80 - 0x2229
         unsigned char x2229_2 : 1;                // 0x40 - 0x2229
         unsigned char x2229_3 : 1;                // 0x20 - 0x2229

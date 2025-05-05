@@ -62,8 +62,6 @@ void OnCSSLoad(HSD_Archive *archive)
 
     Cam_Button_Create();
     Hazards_Button_Create();
-
-    return;
 }
 
 void Read_Recordings()
@@ -164,8 +162,6 @@ void Cam_Button_Create()
     button_text->trans.Y = (button_jobj->trans.Y * -1) + (-1.6 * (scale->Y / 4.0));
 
     Text_AddSubtext(button_text, 0, 0, "Import");
-
-    return;
 }
 
 void Cam_Button_Think(GOBJ *button_gobj)
@@ -196,8 +192,6 @@ void Cam_Button_Think(GOBJ *button_gobj)
         import_data.menu_gobj = Menu_Create();
         SFX_PlayCommon(1);
     }
-
-    return;
 }
 
 static char *hazard_button_text_options[] = {"Hazards: On", "Hazards: Off"};
@@ -230,8 +224,6 @@ void Hazards_Button_Create()
 
     char *text = hazard_button_text_options[event_desc->disable_hazards];
     hazard_button_subtext = Text_AddSubtext(hazard_button_text, 0, 0, text);
-
-    return;
 }
 
 void Hazards_Button_Think(GOBJ *button_gobj)
@@ -261,8 +253,6 @@ void Hazards_Button_Think(GOBJ *button_gobj)
         char *new_text = hazard_button_text_options[new_hazard_state];
         Text_SetText(hazard_button_text, hazard_button_subtext, new_text);
     }
-
-    return;
 }
 
 // Import Menu Functions
@@ -352,8 +342,6 @@ void Menu_Destroy(GOBJ *menu_gobj)
     // enable CSS inputs
     *stc_css_exitkind = 0;
     *stc_css_delay = 0;
-
-    return;
 }
 void Menu_Think(GOBJ *menu_gobj)
 {
@@ -378,8 +366,6 @@ void Menu_Think(GOBJ *menu_gobj)
         break;
     }
     }
-
-    return;
 }
 // Select Card
 void Menu_SelCard_Init(GOBJ *menu_gobj)
@@ -416,8 +402,6 @@ void Menu_SelCard_Init(GOBJ *menu_gobj)
 
     // edit description
     Text_SetText(import_data.desc_text, 0, "");
-
-    return;
 }
 void Menu_SelCard_Think(GOBJ *menu_gobj)
 {
@@ -499,8 +483,6 @@ void Menu_SelCard_Think(GOBJ *menu_gobj)
         else
             SFX_PlayCommon(3);
     }
-
-    return;
 }
 void Menu_SelCard_Exit(GOBJ *menu_gobj)
 {
@@ -510,8 +492,6 @@ void Menu_SelCard_Exit(GOBJ *menu_gobj)
     // destroy memcard text
     Text_Destroy(import_data.option_text);
     import_data.option_text = 0;
-
-    return;
 }
 // Select File
 void Menu_SelFile_Init(GOBJ *menu_gobj)
@@ -601,8 +581,6 @@ void Menu_SelFile_Init(GOBJ *menu_gobj)
         Menu_Confirm_Init(menu_gobj, CFRM_ERR);
         SFX_PlayCommon(3);
     }
-
-    return;
 }
 void Menu_SelFile_Think(GOBJ *menu_gobj)
 {
@@ -743,8 +721,6 @@ void Menu_SelFile_Think(GOBJ *menu_gobj)
         Menu_Confirm_Init(menu_gobj, kind);
         SFX_PlayCommon(1);
     }
-
-    return;
 }
 void Menu_SelFile_Exit(GOBJ *menu_gobj)
 {
@@ -784,8 +760,6 @@ void Menu_SelFile_Exit(GOBJ *menu_gobj)
             import_data.snap.file_data[i] = 0;
         }
     }
-
-    return;
 }
 int Menu_SelFile_LoadPage(GOBJ *menu_gobj, int page)
 {
@@ -1021,8 +995,6 @@ void Menu_Confirm_Init(GOBJ *menu_gobj, int kind)
         break;
     }
     }
-
-    return;
 }
 
 void Menu_Left_Right(int down, u8* cursor)
@@ -1250,8 +1222,6 @@ void Menu_Confirm_Think(GOBJ *menu_gobj)
         break;
     }
     }
-
-    return;
 }
 void Menu_Confirm_Exit(GOBJ *menu_gobj)
 {
@@ -1262,20 +1232,15 @@ void Menu_Confirm_Exit(GOBJ *menu_gobj)
     // destroy gobj
     GObj_Destroy(import_data.confirm.gobj);
     import_data.confirm.gobj = 0;
-
-    return;
 }
 
 // Misc functions
 void Memcard_Wait()
 {
-
     while (stc_memcard_work->is_done == 0)
     {
         blr2();
     }
-
-    return;
 }
 ExportHeader *GetExportHeaderFromCard(int slot, char *fileName, void *buffer) {
     CARDFileInfo card_file_info;

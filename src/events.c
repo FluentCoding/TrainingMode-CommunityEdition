@@ -388,7 +388,7 @@ EventDesc Powershield = {
     .isSelectStage = false,
     .use_savestates = false,
     .disable_hazards = true,
-    .force_sopo = false,
+    .force_sopo = true,
     .scoreType = 0,
     .callbackPriority = 3,
     .matchData = &Powershield_MatchData,
@@ -1116,24 +1116,16 @@ void EventInit(int page, int eventID, MatchInit *matchData)
         u8 cpu_port = *stc_css_cpuport + 1;
 
         // Initialize all player data
-        Memcard *memcard = R13_PTR(MEMCARD);
-        CSSBackup eventBackup = memcard->EventBackup;
-        for (int i = 0; i < 6; i++)
-        {
-            // initialize data
-            CSS_InitPlayerData(&matchData->playerData[i]);
-
-            // copy nametag id for the player
-            if (i == 0)
-            {
-                // Update the player's nametag ID
-                matchData->playerData[0].nametag = eventBackup.nametag;
-
-                // Update the player's rumble setting
-                int tagRumble = CSS_GetNametagRumble(0, matchData->playerData[0].nametag);
-                matchData->playerData[0].isRumble = tagRumble;
-            }
+        for (int i = 0; i < 6; i++) {
+          CSS_InitPlayerData(&matchData->playerData[i]);
+          matchData->playerData[i].stocks = 1;
         }
+
+        // Update the player's nametag ID and rumble
+        Memcard *memcard = R13_PTR(MEMCARD);
+        u8 nametag = memcard->EventBackup.nametag;
+        matchData->playerData[0].nametag = nametag;
+        matchData->playerData[0].isRumble = CSS_GetNametagRumble(0, nametag);
 
         // Determine the CPU
         s32 cpu_kind;
@@ -1181,8 +1173,6 @@ void EventInit(int page, int eventID, MatchInit *matchData)
 
     // Determine the Stage
     matchData->stage = event->isSelectStage ? preload->queued.stage : eventMatchData->stage;
-
-    return;
 };
 
 void EventLoad()
@@ -1249,8 +1239,6 @@ void EventLoad()
     // Store update function
     HSD_Update *update = stc_hsd_update;
     update->onFrame = EventUpdate;
-
-    return;
 };
 
 void EventUpdate()
@@ -1281,8 +1269,6 @@ void EventUpdate()
     }
     else
         Develop_UpdateMatchHotkeys();
-
-    return;
 }
 
 //////////////////////
@@ -1337,8 +1323,6 @@ void TM_CreateConsole()
         DevelopText_HideBG(text);
         DevelopText_HideText(text);
     }
-
-    return;
 }
 
 void OnFileLoad(HSD_Archive *archive) // this function is run right after TmDt is loaded into memory on boot
@@ -1349,27 +1333,21 @@ void OnFileLoad(HSD_Archive *archive) // this function is run right after TmDt i
     // store pointer to static variables
     *event_vars_ptr = &stc_event_vars;
     event_vars = *event_vars_ptr;
-
-    return;
 }
 
 void OnSceneChange()
 {
     // Hook exists at 801a4c94
-
     TM_CreateWatermark();
 
 #if TM_DEBUG == 2
     TM_CreateConsole();
 #endif
-
-    return;
 };
 
 void OnBoot()
 {
     // OSReport("hi this is boot\n");
-    return;
 };
 
 void OnStartMelee()
@@ -1377,8 +1355,6 @@ void OnStartMelee()
 
     Message_Init();
     Tip_Init();
-
-    return;
 }
 
 ///////////////////////////////
@@ -2113,8 +2089,6 @@ void Update_Savestates()
             }
         }
     }
-
-    return;
 }
 int GOBJToID(GOBJ *gobj)
 {
@@ -2220,7 +2194,6 @@ JOBJ *IDToBone(FighterData *fighter_data, int id)
 void Event_IncTimer(GOBJ *gobj)
 {
     stc_event_vars.game_timer++;
-    return;
 }
 void TM_CreateWatermark()
 {
@@ -2253,8 +2226,6 @@ void TM_CreateWatermark()
     Text_SetColor(text, shadow3, &shadow_color);
 
     Text_AddSubtext(text, 0, 0, TM_VersShort);
-
-    return;
 }
 void Hazards_Disable()
 {
@@ -2358,8 +2329,6 @@ void Message_Init()
 
     // store gobj pointer
     stc_msgmgr = mgr_gobj;
-
-    return;
 }
 GOBJ *Message_Display(int msg_kind, int queue_num, int msg_color, char *format, ...)
 {
@@ -2678,8 +2647,6 @@ void Message_Destroy(GOBJ **msg_queue, int msg_num)
                 this_msg_data->prev_index = i + 1; // prev position
         }
     }
-
-    return;
 }
 void Message_Add(GOBJ *msg_gobj, int queue_num)
 {
@@ -2749,16 +2716,11 @@ void Message_Add(GOBJ *msg_gobj, int queue_num)
     // set prev pos to -1 (slides in)
     msg_data->prev_index = -1;
     msg_data->orig_index = 0;
-
-    return;
 }
 void Message_CObjThink(GOBJ *gobj)
 {
-
     if (Pause_CheckStatus(1) != 2)
         CObjThink_Common(gobj);
-
-    return;
 }
 
 float BezierBlend(float t)
@@ -2775,8 +2737,6 @@ void Tip_Init()
     // create tipmgr gobj
     GOBJ *tipmgr_gobj = GObj_Create(0, 7, 0);
     GObj_AddProc(tipmgr_gobj, Tip_Think, 18);
-
-    return;
 }
 void Tip_Think(GOBJ *gobj)
 {
@@ -2843,8 +2803,6 @@ void Tip_Think(GOBJ *gobj)
         }
         }
     }
-
-    return;
 }
 int Tip_Display(int lifetime, char *fmt, ...)
 {
@@ -2984,8 +2942,6 @@ void Tip_Destroy()
 
         stc_tipmgr.state = 2; // enter wait
     }
-
-    return;
 }
 
 ////////////////////////////
@@ -3051,6 +3007,7 @@ void EventMenu_Update(GOBJ *gobj)
     else if ((menuData->mode == MenuMode_Paused) && (currMenu->menu_think != 0))
     {
         update_menu = currMenu->menu_think(gobj);
+        EventMenu_UpdateText(gobj, currMenu);
     }
 
     int exit_menu = 0;
@@ -3193,23 +3150,18 @@ void EventMenu_Update(GOBJ *gobj)
         Match_ShowHUD();
         Match_AdjustSoundOnPause(0);
     }
-
-    return;
 }
 
 void EventMenu_MenuGX(GOBJ *gobj, int pass)
 {
     if (stc_event_vars.hide_menu == 0)
         GXLink_Common(gobj, pass);
-    return;
 }
 
 void EventMenu_TextGX(GOBJ *gobj, int pass)
 {
-
     if (stc_event_vars.hide_menu == 0)
         Text_GX(gobj, pass);
-    return;
 }
 
 void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
@@ -3241,8 +3193,8 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
 
     // get option variables
     s16 option_val = currOption->option_val;
-    s16 value_min = 0;
-    s16 value_max = currOption->value_num;
+    s16 value_min = currOption->value_min;
+    s16 value_max = value_min + currOption->value_num;
 
     // check for dpad down
     if (((inputs & HSD_BUTTON_DOWN) != 0) || ((inputs & HSD_BUTTON_DPAD_DOWN) != 0)) {
@@ -3426,9 +3378,8 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
         */
 
         // check to run a function
-        if ((currOption->option_kind == OPTKIND_FUNC) && (currOption->onOptionSelect != 0))
+        if (currOption->option_kind == OPTKIND_FUNC && currOption->onOptionSelect != 0)
         {
-
             // execute function
             currOption->onOptionSelect(gobj);
 
@@ -3497,8 +3448,6 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
         // update menu
         EventMenu_UpdateText(gobj, currMenu);
     }
-
-    return;
 }
 
 void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu)
@@ -3644,8 +3593,6 @@ void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu)
         // update menu
         EventMenu_UpdatePopupText(gobj, currOption);
     }
-
-    return;
 }
 
 void EventMenu_CreateModel(GOBJ *gobj, EventMenu *menu)
@@ -3779,8 +3726,6 @@ void EventMenu_CreateModel(GOBJ *gobj, EventMenu *menu)
         menuData->scroll_bot = 0;
         menuData->scroll_top = 0;
     }
-
-    return;
 }
 
 void EventMenu_CreateText(GOBJ *gobj, EventMenu *menu)
@@ -3899,8 +3844,6 @@ void EventMenu_CreateText(GOBJ *gobj, EventMenu *menu)
         float optionY = MENU_OPTIONVALYPOS + (i * MENU_TEXTYOFFSET);
         subtext = Text_AddSubtext(text, optionX, optionY, &nullString);
     }
-
-    return;
 }
 
 void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu)
@@ -4116,8 +4059,6 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu)
 
     // update jobj
     JOBJ_SetMtxDirtySub(gobj->hsd_object);
-
-    return;
 }
 
 void EventMenu_DestroyMenu(GOBJ *gobj)
@@ -4160,8 +4101,6 @@ void EventMenu_DestroyMenu(GOBJ *gobj)
     // remove jobj
     GObj_FreeObject(gobj);
     //GObj_DestroyGXLink(gobj);
-
-    return;
 }
 
 void EventMenu_CreatePopupModel(GOBJ *gobj, EventMenu *menu)
@@ -4241,8 +4180,6 @@ void EventMenu_CreatePopupModel(GOBJ *gobj, EventMenu *menu)
     jobj_highlight->dobj->next->mobj->mat->diffuse = highlight;
 
     menuData->highlight_popup = jobj_highlight;
-
-    return;
 }
 
 void EventMenu_CreatePopupText(GOBJ *gobj, EventMenu *menu)
@@ -4283,8 +4220,6 @@ void EventMenu_CreatePopupText(GOBJ *gobj, EventMenu *menu)
         float optionY = baseYPos + (i * POPUP_TEXTYOFFSET);
         subtext = Text_AddSubtext(text, optionX, optionY, &nullString);
     }
-
-    return;
 }
 
 void EventMenu_UpdatePopupText(GOBJ *gobj, EventOption *option)
@@ -4329,8 +4264,6 @@ void EventMenu_UpdatePopupText(GOBJ *gobj, EventOption *option)
     JOBJ *highlight_joint = menuData->highlight_popup;
     highlight_joint->trans.Y = cursor * POPUPHIGHLIGHT_YOFFSET;
     JOBJ_SetMtxDirtySub(highlight_joint);
-
-    return;
 }
 
 void EventMenu_DestroyPopup(GOBJ *gobj)

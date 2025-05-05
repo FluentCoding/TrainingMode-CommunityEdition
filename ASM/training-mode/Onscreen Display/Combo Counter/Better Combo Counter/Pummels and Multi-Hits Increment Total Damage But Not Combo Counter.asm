@@ -1,5 +1,5 @@
     # To be inserted at 80040f04
-    .include "../../../Globals.s"
+    .include "../../../../Globals.s"
     .include "../../../../m-ex/Header.s"
 
     .set entity, 31
@@ -16,11 +16,11 @@
 
     # Get Attacker Pointer
     mr r3, r27
-    branchl r12, 0x80034110
+    branchl r12, PlayerBlock_LoadMainCharDataOffset
     lwz r5, 0x2C(r3)
     # Get Victim Pointer
     mr r3, r28
-    branchl r12, 0x80034110
+    branchl r12, PlayerBlock_LoadMainCharDataOffset
     lwz r6, 0x2C(r3)
 
 ######################

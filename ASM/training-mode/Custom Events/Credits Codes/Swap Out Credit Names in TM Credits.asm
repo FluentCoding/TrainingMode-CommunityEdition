@@ -1,6 +1,6 @@
     # To be inserted at 801aac60
     # 80100000
-    .include "../../Globals.s"
+    .include "../../../Globals.s"
     .include "../../../m-ex/Header.s"
 
     b FunctionStart
@@ -231,7 +231,7 @@ CheckWhitelist:
     # Create Text
     li r3, 0
     li r4, 0
-    branchl r12, 0x803a6754
+    branchl r12, Text_CreateTextStruct
     mr text, r3
     # Init Some Values
     li r0, 1

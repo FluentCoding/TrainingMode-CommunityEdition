@@ -1,5 +1,5 @@
     # To be inserted at 80099b74
-    .include "../../Globals.s"
+    .include "../../../Globals.s"
     .include "../../../m-ex/Header.s"
 
     # Get Airdodge Angle

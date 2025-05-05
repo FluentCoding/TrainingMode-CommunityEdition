@@ -1,5 +1,5 @@
     # To be inserted at 80264504
-    .include "../../Globals.s"
+    .include "../../../Globals.s"
     .include "../../../m-ex/Header.s"
 
     .set text, 31
@@ -18,7 +18,7 @@
     # Check For Custom Event
     lwz r3, MemcardData(r13)
     lbz r3, CurrentEventPage(r3)
-    lwz r4, -0x77C0(r13)
+    lwz r4, MemcardData(r13)
     lbz r4, 0x0535(r4)          # get event ID
     rtocbl r12, TM_GetEventName
 
@@ -36,7 +36,7 @@
     # CREATE TEXT OBJECT, RETURN POINTER TO STRUCT IN r3
     li r3, 0
     li r4, 0
-    branchl r12, 0x803a6754
+    branchl r12, Text_CreateTextStruct
 
     # BACKUP STRUCT POINTER
     mr text, r3
@@ -63,14 +63,14 @@
     mr r4, EventName            # pointer to ASCII
     lfs f1, 0x0(textProperties) # X offset of text
     lfs f2, 0x4(textProperties) # Y offset of text
-    branchl r12, 0x803a6b98
+    branchl r12, Text_InitializeSubtext
 
     # Set Size/Scaling
     mr r4, r3
     mr r3, text
     lfs f1, 0x8(textProperties) # get text scaling value from table
     lfs f2, 0x8(textProperties) # get text scaling value from table
-    branchl r12, 0x803a7548
+    branchl r12, Text_UpdateSubtextSize
 
     b Original
 

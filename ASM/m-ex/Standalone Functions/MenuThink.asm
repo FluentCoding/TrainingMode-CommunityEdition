@@ -48,7 +48,7 @@ SkipLockoutDec:
     beq NoA
     # SFX
     li r3, 1
-    branchl r12, 0x80024030
+    branchl r12, SFX_MenuCommonSound
     # Store Input Lockout
     li r3, 5
     sth r3, -0x4AD8(r13)
@@ -89,7 +89,7 @@ Enter_Menu:
     bctrl
     # Delete this menu gobj
     mr r3, REG_GObj
-    branchl r12, 0x80390228
+    branchl r12, GObj_Destroy
     b Exit
 
 Enter_MenuNoEvent:
@@ -113,7 +113,7 @@ Enter_MenuNoSlippi:
     branchl r12, 0x8024cd64
     # Delete this menu gobj
     mr r3, REG_GObj
-    branchl r12, 0x80390228
+    branchl r12, GObj_Destroy
     b Exit
 
 Enter_MenuNoMultiman:
@@ -126,7 +126,7 @@ Enter_MenuNoSpecial:
     bctrl
     # Delete this menu gobj
     mr r3, REG_GObj
-    branchl r12, 0x80390228
+    branchl r12, GObj_Destroy
     b Exit
 
 Enter_MenuNoCB:
@@ -172,7 +172,7 @@ SearchNextCursor__Exit:
     branchl r12, 0x80390cd4
     # Delete this menu gobj
     mr r3, REG_GObj
-    branchl r12, 0x80390228
+    branchl r12, GObj_Destroy
     # Get next menu
     lwz r3, OFST_mexMenu(r13)
     lwz r3, mexMenu_MenuDef(r3)
@@ -183,11 +183,11 @@ SearchNextCursor__Exit:
     li r3, 0
     li r4, 1
     li r5, 128
-    branchl r12, 0x803901f0
+    branchl r12, GObj_Create
     # Set this proc
     load r4, MenuThink
     li r5, 0
-    branchl r12, 0x8038fd54
+    branchl r12, GObj_AddProc
     # Adjust this proc?
     lwz r4, -0x3E64(r13)
     lbz r0, 0x000D(r3)
@@ -211,7 +211,7 @@ NoA:
     beq NoB
     # SFX
     li r3, 0
-    branchl r12, 0x80024030
+    branchl r12, SFX_MenuCommonSound
 
     # Check for title screen
     lbz r3, MenuDef_PrevMenu(REG_MenuDef)
@@ -284,16 +284,16 @@ SearchPrevCursor_Exit:
     branchl r12, 0x80390cd4
     # Delete this menu gobj
     mr r3, REG_GObj
-    branchl r12, 0x80390228
+    branchl r12, GObj_Destroy
     # Create next menu gobj
     li r3, 0
     li r4, 1
     li r5, 128
-    branchl r12, 0x803901f0
+    branchl r12, GObj_Create
     # Set this proc
     load r4, MenuThink
     li r5, 0
-    branchl r12, 0x8038fd54
+    branchl r12, GObj_AddProc
     # Adjust this proc?
     lwz r4, -0x3E64(r13)
     lbz r0, 0x000D(r3)
@@ -308,7 +308,7 @@ NoB:
     beq NoUp
     # SFX
     li r3, 2
-    branchl r12, 0x80024030
+    branchl r12, SFX_MenuCommonSound
 
 CursorUpInitLoop:
     .set REG_TempCursor, 20
@@ -342,7 +342,7 @@ NoUp:
     beq NoDown
     # SFX
     li r3, 2
-    branchl r12, 0x80024030
+    branchl r12, SFX_MenuCommonSound
 
 CursorDownInitLoop:
     .set REG_TempCursor, 20

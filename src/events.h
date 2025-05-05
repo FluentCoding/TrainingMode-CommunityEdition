@@ -1,7 +1,7 @@
 #include "../MexTK/mex.h"
 
-#define TM_VERSSHORT "TM-CE v1.2 d2"
-#define TM_VERSLONG "TM Community Edition v1.2 d2"
+#define TM_VERSSHORT "TM-CE v1.2 d4"
+#define TM_VERSLONG "TM Community Edition v1.2 d4"
 #define TM_DEBUG 0 // 0 = release (no logging), 1 = OSReport logs, 2 = onscreen logs
 #define EVENT_DATASIZE 512
 #define TM_FUNC -(50 * 4)
@@ -99,14 +99,15 @@ typedef struct EventOption
 {
     u8 option_kind;                                     // the type of option this is; string, integers, etc
     u8 disable;                                         // boolean for disabling the option
+    s16 value_min;                                      // number of values
     u16 value_num;                                      // number of values
-    u16 option_val;                                     // value of this option
+    s16 option_val;                                     // value of this option
     EventMenu *menu;                                    // pointer to the menu that pressing A opens
     char *option_name;                                  // pointer to the name of this option
     char *desc;                                         // pointer to the description string for this option
     void **option_values;                               // pointer to an array of strings
     void (*onOptionChange)(GOBJ *menu_gobj, int value); // function that runs when option is changed
-    GOBJ *(*onOptionSelect)(GOBJ *menu_gobj);           // function that runs when option is selected
+    void (*onOptionSelect)(GOBJ *menu_gobj);            // function that runs when option is selected
 } EventOption;
 typedef struct Shortcut {
     int buttons_mask;
@@ -118,15 +119,15 @@ typedef struct ShortcutList {
 } ShortcutList;
 struct EventMenu
 {
-    char *name;                         // name of this menu
-    u8 option_num;                      // number of options this menu contains
-    u8 scroll;                          //
-    u8 state;                           // bool used to know if this menu is focused
-    u8 cursor;                          // index of the option currently selected
-    EventOption *options;               // pointer to all of this menu's options
-    EventMenu *prev;                    // pointer to previous menu, used at runtime
-    int (*menu_think)(GOBJ *menu_gobj); // function that runs every frame of this menu. returns a bool which indicates if basic menu code should be execution
-    ShortcutList *shortcuts;            // pointer to shortcuts when shortcut mode is entered on this menu
+    char *name;                    // name of this menu
+    u8 option_num;                 // number of options this menu contains
+    u8 scroll;                     //
+    u8 state;                      // bool used to know if this menu is focused
+    u8 cursor;                     // index of the option currently selected
+    EventOption *options;          // pointer to all of this menu's options
+    EventMenu *prev;               // pointer to previous menu, used at runtime
+    int (*menu_think)(GOBJ *menu); // function that runs every frame.
+    ShortcutList *shortcuts;       // pointer to shortcuts when shortcut mode is entered on this menu
 };
 typedef enum MenuMode {
     MenuMode_Normal,
