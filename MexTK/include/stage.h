@@ -646,4 +646,7 @@ void Stage_DisableColAnim(GOBJ *map);
 void Stages_MovingCollisionPointsUpdate(int moving_collision_idx);
 int Stage_GetExternalID();
 int Stage_ExternalToInternal(int ext_id);
+void Stage_GetLeftOfLineCoordinates(int ledge_id, Vec3 *pos_out);
+void Stage_GetRightOfLineCoordinates(int ledge_id, Vec3 *pos_out);
 #endif
+
