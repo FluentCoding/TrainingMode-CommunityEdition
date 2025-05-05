@@ -47,7 +47,7 @@ static void UpdatePosition(GOBJ *fighter) {
     data->coll_data.coll_test = R13_INT(COLL_TEST);
 }
 
-static void TargetLedgeCoords(Vec2 coords_out[2]) {
+static void GetLedgePositions(Vec2 coords_out[2]) {
     static char ledge_ids[34][2] = {
         { 0xFF, 0xFF }, { 0xFF, 0xFF }, { 0x03, 0x07 }, { 0x33, 0x36 },
         { 0x03, 0x0D }, { 0x29, 0x45 }, { 0x05, 0x11 }, { 0x09, 0x1A },
@@ -64,7 +64,6 @@ static void TargetLedgeCoords(Vec2 coords_out[2]) {
     char left_id = ledge_ids[stage_id][0];
     char right_id = ledge_ids[stage_id][1];
 
-    // we add/subtract a bit from the ledge, because we can snap from quite a bit further than the actual ledge
     Vec3 pos;
     Stage_GetLeftOfLineCoordinates(left_id, &pos);
     coords_out[0] = (Vec2) { pos.X, pos.Y };
@@ -223,11 +222,16 @@ void Reset(void) {
 }
 
 void Event_Init(GOBJ *gobj) {
-    TargetLedgeCoords(&ledge_positions);
+    GetLedgePositions(&ledge_positions);
     Reset();
 }
 
 void Event_Think(GOBJ *menu) {
+    GOBJ *hmn = Fighter_GetGObj(0);
+    GOBJ *cpu = Fighter_GetGObj(1);
+    FighterData *hmn_data = hmn->userdata;
+    FighterData *cpu_data = cpu->userdata;
+
     if (reset_timer > 0) 
         reset_timer--;
 
@@ -235,18 +239,14 @@ void Event_Think(GOBJ *menu) {
         reset_timer = -1;
         Reset();
     }
-
-    GOBJ *hmn = Fighter_GetGObj(0);
-    GOBJ *cpu = Fighter_GetGObj(1);
-    FighterData *hmn_data = hmn->userdata;
-    FighterData *cpu_data = cpu->userdata;
-
-    hmn_data->input.timer_trigger_any_ignore_hitlag = 0; // always l-cancel
-
+    
     int cpu_state = cpu_data->state_id;
     int dir = cpu_data->phys.pos.X > 0.f ? -1 : 1;
     Vec2 *target_ledge = &ledge_positions[cpu_data->phys.pos.X > 0.f];
-
+    
+    // ensure the player L-cancels the initial bair.
+    hmn_data->input.timer_trigger_any_ignore_hitlag = 0;
+    
     if (
         reset_timer == -1
         && (
@@ -265,23 +265,21 @@ void Event_Think(GOBJ *menu) {
         // DI inwards
         cpu_data->cpu.lstickX = 90 * dir;
         cpu_data->cpu.lstickY = 90;
-
     } else if (air_actionable(cpu)) {
         float distance_to_ledge = Vec2_Distance(&cpu_data->phys.pos, target_ledge);
         if (
             // force upb if at end of range
             FIREFOX_DISTANCE - 5.f < distance_to_ledge
 
-            // random chance to upb
+            // otherwise, random chance to upb
             || (distance_to_ledge < FIREFOX_DISTANCE && HSD_Randi(FIREFOX_CHANCE) == 0)
         ) {
             cpu_data->cpu.lstickY = 127;
             cpu_data->cpu.held |= PAD_BUTTON_B;
         } else {
-            // drift towards stage
+            // drift towards stage if out of range
             cpu_data->cpu.lstickX = 127 * dir;
         }
-
     } else if (0x161 <= cpu_state && cpu_state <= 0x167) {
         // compute firefox angle
         Vec3 vec_to_ledge = {
