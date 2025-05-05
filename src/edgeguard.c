@@ -16,11 +16,6 @@
 
 #define DEGREES_TO_RADIANS 0.01745329252
 
-static Savestate *savestate;
-
-// 1 for right, -1 for left
-static int side;
-
 void Exit(int value);
 
 static EventOption Options_Main[] = {
@@ -49,6 +44,31 @@ static void UpdatePosition(GOBJ *fighter) {
     data->coll_data.coll_test = R13_INT(COLL_TEST);
 }
 
+static void TargetLedgeCoords(Vec2 coords_out[2]) {
+    static char ledge_ids[34][2] = {
+        { 0xFF, 0xFF }, { 0xFF, 0xFF }, { 0x03, 0x07 }, { 0x33, 0x36 },
+        { 0x03, 0x0D }, { 0x29, 0x45 }, { 0x05, 0x11 }, { 0x09, 0x1A },
+        { 0x02, 0x06 }, { 0x15, 0x17 }, { 0x00, 0x00 }, { 0x43, 0x4C },
+        { 0x00, 0x00 }, { 0x00, 0x00 }, { 0x0E, 0x0D }, { 0x00, 0x00 },
+        { 0x00, 0x05 }, { 0x1E, 0x2E }, { 0x0C, 0x0E }, { 0x02, 0x04 },
+        { 0x03, 0x05 }, { 0x00, 0x00 }, { 0x06, 0x12 }, { 0x00, 0x00 },
+        { 0xD7, 0xE2 }, { 0x00, 0x00 }, { 0x00, 0x00 }, { 0x00, 0x00 },
+        { 0x03, 0x05 }, { 0x03, 0x0B }, { 0x06, 0x10 }, { 0x00, 0x05 },
+        { 0x00, 0x02 }, { 0x01, 0x01 },
+    };
+
+    int stage_id = Stage_GetExternalID();
+    char left_id = ledge_ids[stage_id][0];
+    char right_id = ledge_ids[stage_id][1];
+
+    // we add/subtract a bit from the ledge, because we can snap from quite a bit further than the actual ledge
+    Vec3 pos;
+    Stage_GetLeftOfLineCoordinates(left_id, &pos);
+    coords_out[0] = (Vec2) { pos.X, pos.Y };
+    Stage_GetRightOfLineCoordinates(right_id, &pos);
+    coords_out[1] = (Vec2) { pos.X, pos.Y };
+}
+
 static void UpdateCameraBox(GOBJ *fighter) {
     Fighter_UpdateCameraBox(fighter);
     
@@ -60,18 +80,16 @@ static void UpdateCameraBox(GOBJ *fighter) {
     Match_CorrectCamera();
 }
 
-static float Vec3_Distance(Vec3 *a, Vec3 *b) {
+static float Vec2_Distance(Vec2 *a, Vec2 *b) {
     float dx = a->X - b->X;
     float dy = a->Y - b->Y;
-    float dz = a->Z - b->Z;
-    return sqrtf(dx*dx + dy*dy + dz*dz);
+    return sqrtf(dx*dx + dy*dy);
 }
 
-static float Vec3_Length(Vec3 *a) {
+static float Vec2_Length(Vec2 *a) {
     float x = a->X;
     float y = a->Y;
-    float z = a->Z;
-    return sqrtf(x*x + y*y + z*z);
+    return sqrtf(x*x + y*y);
 }
 
 void Exit(int value) {
@@ -88,7 +106,7 @@ void Reset(void) {
     
     //cpu_data->cpu.ai = 15;
     
-    side = HSD_Randi(2) * 2 - 1;
+    int side = HSD_Randi(2) * 2 - 1;
     
     hmn_data->facing_direction = -side; 
     cpu_data->facing_direction = -side;
@@ -164,13 +182,15 @@ void Reset(void) {
     Fighter_SetHUDDamage(cpu_data->ply, dmg);
 }
 
+static int reset_timer = -1;
+static Vec2 target_ledges[2];
+
 void Event_Init(GOBJ *gobj) {
+    TargetLedgeCoords(&target_ledges);
     Reset();
     /*savestate = HSD_MemAlloc(sizeof(*savestate));
     (stc_event_vars.Savestate_Save)(savestate);*/
 }
-
-static int reset_timer = -1;
 
 void Event_Think(GOBJ *menu) {
     if (reset_timer > 0) 
@@ -189,6 +209,7 @@ void Event_Think(GOBJ *menu) {
     hmn_data->input.timer_trigger_any_ignore_hitlag = 0; // always l-cancel
     
     int cpu_state = cpu_data->state_id;
+    Vec2 *target_ledge = &target_ledges[cpu_data->phys.pos.X > 0.f];
     
     if (
         reset_timer == -1
@@ -206,7 +227,7 @@ void Event_Think(GOBJ *menu) {
         // pass until hitstun over
         
     } else if (cpu_state == ASID_DAMAGEFALL) {
-        float distance_to_ledge = Vec3_Distance(&cpu_data->phys.pos, &cpu_data->cpu.nearest_ledge);
+        float distance_to_ledge = Vec2_Distance(&cpu_data->phys.pos, target_ledge);
         OSReport("checking %f %f, %f\n", cpu_data->cpu.nearest_ledge.X, cpu_data->cpu.nearest_ledge.Y, distance_to_ledge);
         if (
             distance_to_ledge < FIREFOX_DISTANCE
@@ -219,9 +240,8 @@ void Event_Think(GOBJ *menu) {
     } else if (0x161 <= cpu_state && cpu_state <= 0x167) {
         // compute firefox angle
         Vec3 vec_to_ledge = {
-            .X = cpu_data->cpu.nearest_ledge.X - cpu_data->phys.pos.X,
-            .Y = cpu_data->cpu.nearest_ledge.Y - cpu_data->phys.pos.Y,
-            .Z = cpu_data->cpu.nearest_ledge.Z - cpu_data->phys.pos.Z,
+            .X = target_ledge->X - cpu_data->phys.pos.X,
+            .Y = target_ledge->Y - cpu_data->phys.pos.Y,
         };
         Vec3_Normalize(&vec_to_ledge);
         
