@@ -1274,9 +1274,7 @@ struct CPU
     void *x48;                   // 0x48
     int x4c;                     // 0x4c
     int x50;                     // 0x50
-    float x54;                   // 0x54
-    float x58;                   // 0x58
-    float x5c;                   // 0x5c
+    Vec3 nearest_ledge;          // 0x54
     int x60;                     // 0x60
     int x64;                     // 0x64
     int x68;                     // 0x68
