@@ -250,7 +250,8 @@ void Event_Think(GOBJ *menu) {
     if (
         reset_timer == -1
         && (
-            cpu_data->flags.dead || hmn_data->flags.dead
+            cpu_data->flags.dead
+            || hmn_data->flags.dead
             || cpu_data->phys.air_state == 0
             || cpu_state == ASID_CLIFFCATCH
         )
@@ -282,11 +283,11 @@ void Event_Think(GOBJ *menu) {
         }
     } else if (0x161 <= cpu_state && cpu_state <= 0x167) {
         // compute firefox angle
-        Vec3 vec_to_ledge = {
+        Vec2 vec_to_ledge = {
             .X = target_ledge->X - cpu_data->phys.pos.X,
             .Y = target_ledge->Y - cpu_data->phys.pos.Y,
         };
-        Vec3_Normalize(&vec_to_ledge);
+        Vec2_Normalize(&vec_to_ledge);
 
         cpu_data->cpu.lstickX = (s8)(vec_to_ledge.X * 127.f);
         cpu_data->cpu.lstickY = (s8)(vec_to_ledge.Y * 127.f);
