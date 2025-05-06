@@ -1,19 +1,16 @@
 #include "../MexTK/mex.h"
 #include "events.h"
 
-#define ANGLE_MIN 45.f
-#define ANGLE_MAX 60.f
-#define MAG_MIN 106.f
-#define MAG_MAX 120.f
-#define DMG_MIN 50
-#define DMG_MAX 100
-
+#define DISTANCE_FROM_LEDGE 15
 #define RESET_DELAY 30
 
-#define FIREFOX_CHANCE 8
-#define FIREFOX_DISTANCE 85
-#define DISTANCE_FROM_LEDGE 15
+// 1 in n chance every frame
+#define FIREFOX_CHANCE 8 
+#define DOUBLEJUMP_CHANCE 8
+#define ILLUSION_CHANCE 10
 
+#define ILLUSION_DISTANCE 70
+#define FIREFOX_DISTANCE 80
 #define DEGREES_TO_RADIANS 0.01745329252
 
 static int reset_timer = -1;
@@ -21,7 +18,63 @@ static Vec2 ledge_positions[2];
 
 void Exit(int value);
 
+static const char *OffOn[2] = {"Off", "On"};
+
+enum options {
+    OPT_HITSTRENGTH,
+    OPT_JUMP,
+    OPT_ILLUSION,
+    OPT_EXIT,
+};
+
+typedef struct KBValues {
+    float mag_min, mag_max;
+    float ang_min, ang_max;
+    float dmg_min, dmg_max;
+} KBValues;
+
+static const char *Values_HitStrength[] = {"Weak", "Normal", "Hard"};
+static KBValues HitStrength_KBRange[] = {
+    {
+         80.f, 100.f, // mag
+         45.f,  60.f, // ang
+         10.f,  40.f, // dmg
+    },
+    {
+        106.f, 120.f, // mag
+         45.f,  60.f, // ang
+         50.f,  80.f, // dmg
+    },
+    {
+        140.f, 200.f, // mag
+         60.f,  70.f, // ang
+         80.f, 110.f, // dmg
+    },
+};
+
 static EventOption Options_Main[] = {
+    {
+        .option_kind = OPTKIND_STRING,
+        .option_name = "Hit Strength",
+        .desc = "How far Fox will be knocked back.",
+        .option_values = Values_HitStrength,
+        .value_num = countof(Values_HitStrength),
+        .option_val = 1
+    },
+    {
+        .option_kind = OPTKIND_STRING,
+        .option_name = "Double Jump",
+        .desc = "Allow Fox to double jump while recovering.",
+        .option_values = OffOn,
+        .value_num = 2,
+    },
+    {
+        .option_kind = OPTKIND_STRING,
+        .option_name = "Illusion",
+        .desc = "Allow Fox to side special while recovering.",
+        .option_values = OffOn,
+        .value_num = 2,
+    },
     {
         .option_kind = OPTKIND_FUNC,
         .option_name = "Exit",
@@ -30,11 +83,15 @@ static EventOption Options_Main[] = {
     },
 };
 static EventMenu Menu_Main = {
-    .name = "Firefox Edgeguard",
+    .name = "Fox Edgeguard",
     .option_num = sizeof(Options_Main) / sizeof(EventOption),
     .options = &Options_Main,
 };
 EventMenu *Event_Menu = &Menu_Main;
+
+static bool enabled(int opt_idx) {
+    return Options_Main[opt_idx].option_val;
+}
 
 static void UpdatePosition(GOBJ *fighter) {
     FighterData *data = fighter->userdata;
@@ -165,6 +222,9 @@ void Reset(void) {
 
     UpdatePosition(hmn);
     UpdatePosition(cpu);
+    
+    cpu_data->jump.jumps_used = 1;
+    hmn_data->jump.jumps_used = 1;
 
     // set hmn action state
     Fighter_EnterAerial(hmn, ASID_ATTACKAIRB);
@@ -176,20 +236,24 @@ void Reset(void) {
     Fighter_HitboxDisableAll(hmn);
     hmn_data->script.script_current = 0;
 
+    KBValues vals = HitStrength_KBRange[Options_Main[OPT_HITSTRENGTH].option_val];
+    
+    float mag = vals.mag_min + (vals.mag_max - vals.mag_min) * HSD_Randf();
+    
+    int state = mag > 130.f ? ASID_DAMAGEFLYHI : ASID_DAMAGEFLYN;
+
     // set cpu action state
     Fighter_EnterFall(cpu);
-    ActionStateChange(0, 1, 0, cpu, ASID_DAMAGEFLYN, 0x40, 0);
+    ActionStateChange(0, 1, 0, cpu, state, 0x40, 0);
     Fighter_UpdateStateFrameInfo(cpu);
-    cpu_data->jump.jumps_used = cpu_data->attr.max_jumps;
 
     // fix camera
     UpdateCameraBox(hmn);
     UpdateCameraBox(cpu);
-
+    
     // give cpu knockback
-    float angle_deg = ANGLE_MIN + (ANGLE_MAX - ANGLE_MIN) * HSD_Randf();
+    float angle_deg = vals.ang_min + (vals.ang_max - vals.ang_min) * HSD_Randf();
     float angle_rad = angle_deg * DEGREES_TO_RADIANS;
-    float mag = MAG_MIN + (MAG_MAX - MAG_MIN) * HSD_Randf();
 
     float vel = mag * (*stc_ftcommon)->force_applied_to_kb_mag_multiplier;
     float vel_x = cos(angle_rad) * vel * (float)side;
@@ -212,7 +276,7 @@ void Reset(void) {
     cpu_data->flags.hitlag_unk = 1;
 
     // random percent
-    int dmg = DMG_MIN + HSD_Randi(DMG_MAX - DMG_MIN);
+    int dmg = vals.dmg_min + HSD_Randi(vals.dmg_max - vals.dmg_min);
 
     cpu_data->dmg.percent = dmg;
     Fighter_SetHUDDamage(cpu_data->ply, dmg);
@@ -268,15 +332,47 @@ void Event_Think(GOBJ *menu) {
         cpu_data->cpu.lstickY = 90;
     } else if (air_actionable(cpu)) {
         float distance_to_ledge = Vec2_Distance(&cpu_data->phys.pos, target_ledge);
+        
+        // JUMP
         if (
-            // force upb if at end of range
-            FIREFOX_DISTANCE - 5.f < distance_to_ledge
-
-            // otherwise, random chance to upb
-            || (distance_to_ledge < FIREFOX_DISTANCE && HSD_Randi(FIREFOX_CHANCE) == 0)
+            enabled(OPT_JUMP)
+            && cpu_data->jump.jumps_used < 2
+            && (
+                // force jump if at end of range
+                distance_to_ledge > FIREFOX_DISTANCE
+                
+                // otherwise, random chance to jump
+                || HSD_Randi(DOUBLEJUMP_CHANCE) == 0
+            )
+        ) {
+            cpu_data->cpu.held |= PAD_BUTTON_Y;
+            cpu_data->cpu.lstickX = 127 * dir;
+            
+        // ILLUSION
+        } else if (
+            enabled(OPT_ILLUSION)
+            && cpu_data->phys.pos.Y > target_ledge->Y
+            && fabs(target_ledge->X - cpu_data->phys.pos.X) < ILLUSION_DISTANCE
+            && HSD_Randi(ILLUSION_CHANCE) == 0
+        ) {
+            cpu_data->cpu.lstickX = 127 * dir;
+            cpu_data->cpu.held |= PAD_BUTTON_B;
+            
+        // FIREFOX
+        } else if (
+            cpu_data->phys.self_vel.Y <= 0.f
+            && (
+                // force upb if at end of range
+                (cpu_data->phys.pos.Y < 0.f && distance_to_ledge > FIREFOX_DISTANCE)
+    
+                // otherwise, random chance to upb
+                || (distance_to_ledge < FIREFOX_DISTANCE && HSD_Randi(FIREFOX_CHANCE) == 0)
+            )
         ) {
             cpu_data->cpu.lstickY = 127;
             cpu_data->cpu.held |= PAD_BUTTON_B;
+        
+        // ELSE
         } else {
             // drift towards stage if out of range
             cpu_data->cpu.lstickX = 127 * dir;
