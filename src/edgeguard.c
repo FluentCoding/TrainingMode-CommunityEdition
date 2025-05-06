@@ -6,10 +6,14 @@
 
 // 1 in n chance every frame
 #define FIREFOX_CHANCE 8 
-#define DOUBLEJUMP_CHANCE 8
+#define DOUBLEJUMP_CHANCE_BELOW_LEDGE 5
+#define DOUBLEJUMP_CHANCE_ABOVE_LEDGE 30
 #define ILLUSION_CHANCE 10
+#define FASTFALL_CHANCE 8
 
-#define ILLUSION_DISTANCE 70
+#define MAX_ILLUSION_HEIGHT 30.f
+#define MIN_ILLUSION_HEIGHT -15.f
+#define ILLUSION_DISTANCE 75
 #define FIREFOX_DISTANCE 80
 #define DEGREES_TO_RADIANS 0.01745329252
 
@@ -22,8 +26,12 @@ static const char *OffOn[2] = {"Off", "On"};
 
 enum options {
     OPT_HITSTRENGTH,
+    OPT_FF_LOW,
+    OPT_FF_MID,
+    OPT_FF_HIGH,
     OPT_JUMP,
     OPT_ILLUSION,
+    OPT_FASTFALL,
     OPT_EXIT,
 };
 
@@ -47,7 +55,7 @@ static KBValues HitStrength_KBRange[] = {
     },
     {
         140.f, 200.f, // mag
-         60.f,  70.f, // ang
+         65.f,  70.f, // ang
          80.f, 110.f, // dmg
     },
 };
@@ -63,15 +71,44 @@ static EventOption Options_Main[] = {
     },
     {
         .option_kind = OPTKIND_STRING,
+        .option_name = "Firefox Low",
+        .desc = "Allow Fox to aim his up special to the ledge.",
+        .option_values = OffOn,
+        .value_num = 2,
+        .option_val = 1,
+    },
+    {
+        .option_kind = OPTKIND_STRING,
+        .option_name = "Firefox Mid",
+        .desc = "Allow Fox to aim his up special to the stage.",
+        .option_values = OffOn,
+        .value_num = 2,
+    },
+    {
+        .option_kind = OPTKIND_STRING,
+        .option_name = "Firefox High",
+        .desc = "Allow Fox to aim his up special high.",
+        .option_values = OffOn,
+        .value_num = 2,
+    },
+    {
+        .option_kind = OPTKIND_STRING,
         .option_name = "Double Jump",
-        .desc = "Allow Fox to double jump while recovering.",
+        .desc = "Allow Fox to double jump.",
         .option_values = OffOn,
         .value_num = 2,
     },
     {
         .option_kind = OPTKIND_STRING,
         .option_name = "Illusion",
-        .desc = "Allow Fox to side special while recovering.",
+        .desc = "Allow Fox to side special.",
+        .option_values = OffOn,
+        .value_num = 2,
+    },
+    {
+        .option_kind = OPTKIND_STRING,
+        .option_name = "Fast Fall",
+        .desc = "Allow Fox to fast fall.",
         .option_values = OffOn,
         .value_num = 2,
     },
@@ -88,10 +125,6 @@ static EventMenu Menu_Main = {
     .options = &Options_Main,
 };
 EventMenu *Event_Menu = &Menu_Main;
-
-static bool enabled(int opt_idx) {
-    return Options_Main[opt_idx].option_val;
-}
 
 static void UpdatePosition(GOBJ *fighter) {
     FighterData *data = fighter->userdata;
@@ -149,6 +182,10 @@ static float Vec2_Length(Vec2 *a) {
     float x = a->X;
     float y = a->Y;
     return sqrtf(x*x + y*y);
+}
+
+static bool enabled(int opt_idx) {
+    return Options_Main[opt_idx].option_val;
 }
 
 static int in_hitstun_anim(int state) {
@@ -306,7 +343,14 @@ void Event_Think(GOBJ *menu) {
     
     int cpu_state = cpu_data->state_id;
     int dir = cpu_data->phys.pos.X > 0.f ? -1 : 1;
-    Vec2 *target_ledge = &ledge_positions[cpu_data->phys.pos.X > 0.f];
+    
+    Vec2 target_ledge = ledge_positions[cpu_data->phys.pos.X > 0.f];
+    
+    // ledge sweetspot is slightly further away and down if above the stage
+    if (cpu_data->phys.pos.Y > 20.f) {
+        target_ledge.X -= 16 * dir;
+        target_ledge.Y -= 4;
+    }
     
     // ensure the player L-cancels the initial bair.
     hmn_data->input.timer_trigger_any_ignore_hitlag = 0;
@@ -331,8 +375,10 @@ void Event_Think(GOBJ *menu) {
         cpu_data->cpu.lstickX = 90 * dir;
         cpu_data->cpu.lstickY = 90;
     } else if (air_actionable(cpu)) {
-        float distance_to_ledge = Vec2_Distance(&cpu_data->phys.pos, target_ledge);
+        float distance_to_ledge = Vec2_Distance(&cpu_data->phys.pos, &target_ledge);
         
+        int dj_chance = cpu_data->phys.pos.Y > target_ledge.Y ?
+            DOUBLEJUMP_CHANCE_ABOVE_LEDGE : DOUBLEJUMP_CHANCE_BELOW_LEDGE;
         // JUMP
         if (
             enabled(OPT_JUMP)
@@ -342,7 +388,7 @@ void Event_Think(GOBJ *menu) {
                 distance_to_ledge > FIREFOX_DISTANCE
                 
                 // otherwise, random chance to jump
-                || HSD_Randi(DOUBLEJUMP_CHANCE) == 0
+                || HSD_Randi(dj_chance) == 0
             )
         ) {
             cpu_data->cpu.held |= PAD_BUTTON_Y;
@@ -351,8 +397,9 @@ void Event_Think(GOBJ *menu) {
         // ILLUSION
         } else if (
             enabled(OPT_ILLUSION)
-            && cpu_data->phys.pos.Y > target_ledge->Y
-            && fabs(target_ledge->X - cpu_data->phys.pos.X) < ILLUSION_DISTANCE
+            && cpu_data->phys.pos.Y > MIN_ILLUSION_HEIGHT
+            && cpu_data->phys.pos.Y < MAX_ILLUSION_HEIGHT
+            && fabs(target_ledge.X - cpu_data->phys.pos.X) < ILLUSION_DISTANCE
             && HSD_Randi(ILLUSION_CHANCE) == 0
         ) {
             cpu_data->cpu.lstickX = 127 * dir;
@@ -360,8 +407,10 @@ void Event_Think(GOBJ *menu) {
             
         // FIREFOX
         } else if (
-            cpu_data->phys.self_vel.Y <= 0.f
+            cpu_data->phys.self_vel.Y <= 1.5f
             && (
+                enabled(OPT_FF_LOW) || enabled(OPT_FF_MID) || enabled(OPT_FF_HIGH)
+            ) && (
                 // force upb if at end of range
                 (cpu_data->phys.pos.Y < 0.f && distance_to_ledge > FIREFOX_DISTANCE)
     
@@ -371,21 +420,64 @@ void Event_Think(GOBJ *menu) {
         ) {
             cpu_data->cpu.lstickY = 127;
             cpu_data->cpu.held |= PAD_BUTTON_B;
-        
-        // ELSE
+            
+        // FASTFALL
+        } else if (
+            enabled(OPT_FASTFALL)
+            && !cpu_data->flags.is_fastfall
+            && cpu_data->phys.self_vel.Y < 0.f
+            && HSD_Randi(FASTFALL_CHANCE) == 0
+        ) {
+            cpu_data->cpu.lstickY = -127;
+            
+        // WAIT
         } else {
-            // drift towards stage if out of range
+            // drift towards stage
             cpu_data->cpu.lstickX = 127 * dir;
         }
-    } else if (0x161 <= cpu_state && cpu_state <= 0x167) {
+        
+        // if in firefox starting states
+    } else if (0x161 <= cpu_state && cpu_state <= 0x162) {
         // compute firefox angle
-        Vec2 vec_to_ledge = {
-            .X = target_ledge->X - cpu_data->phys.pos.X,
-            .Y = target_ledge->Y - cpu_data->phys.pos.Y,
+        
+        int low = enabled(OPT_FF_LOW);
+        int mid = enabled(OPT_FF_MID);
+        int high = enabled(OPT_FF_HIGH);
+        int option_count = low + mid + high;
+        int choice = HSD_Randi(option_count);
+        
+        float x_to_ledge = fabs(target_ledge.X - cpu_data->phys.pos.X);
+        float high_y = cpu_data->phys.pos.Y + sqrtf(
+            FIREFOX_DISTANCE*FIREFOX_DISTANCE
+            - x_to_ledge*x_to_ledge
+        );
+        
+        Vec2 target = { .X = target_ledge.X };
+        if (low && choice-- == 0) {
+            target.Y = target_ledge.Y;
+        } else if (mid && choice-- == 0) {
+            target.Y = (target_ledge.Y + high_y) / 2.f;
+        } else if (high && choice-- == 0) {
+            target.Y = high_y;
+        }
+        
+        Vec2 vec_to_target = {
+            .X = target.X - cpu_data->phys.pos.X,
+            .Y = target.Y - cpu_data->phys.pos.Y,
         };
-        Vec2_Normalize(&vec_to_ledge);
-
-        cpu_data->cpu.lstickX = (s8)(vec_to_ledge.X * 127.f);
-        cpu_data->cpu.lstickY = (s8)(vec_to_ledge.Y * 127.f);
-    }  
+        Vec2_Normalize(&vec_to_target);
+        
+        cpu_data->cpu.lstickX = (s8)(vec_to_target.X * 127.f);
+        cpu_data->cpu.lstickY = (s8)(vec_to_target.Y * 127.f);
+    
+    } else if (
+        // if in firefox ending states
+        (0x162 <= cpu_state && cpu_state <= 0x167)
+         
+        // or special fall
+        || (ASID_FALLSPECIAL <= cpu_state && cpu_state <= ASID_FALLSPECIALB)
+    ) {
+        // drift towards stage
+        cpu_data->cpu.lstickX = 127 * dir;
+    }
 }
