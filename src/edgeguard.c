@@ -221,7 +221,7 @@ static float Vec2_Length(Vec2 *a) {
     return sqrtf(x*x + y*y);
 }
 
-static bool enabled(int opt_idx) {
+static bool Enabled(int opt_idx) {
     return Options_Main[opt_idx].val;
 }
 
@@ -235,7 +235,7 @@ static int HitstunEnded(GOBJ *fighter) {
     return hitstun == 0.0;
 }
 
-static bool air_actionable(GOBJ *fighter) {
+static bool IsAirActionable(GOBJ *fighter) {
     FighterData *data = fighter->userdata;
 
     // ensure airborne
@@ -393,7 +393,7 @@ void Event_Think(GOBJ *menu) {
     Vec2 vel = { cpu_data->phys.self_vel.X, cpu_data->phys.self_vel.Y };
     int state = cpu_data->state_id;
     int dir = pos.X > 0.f ? -1 : 1;
-    bool can_jump = cpu_data->jump.jumps_used < 2 && enabled(OPT_JUMP);
+    bool can_jump = cpu_data->jump.jumps_used < 2 && Enabled(OPT_JUMP);
     
     Vec2 target_ledge = ledge_positions[pos.X > 0.f];
     
@@ -432,7 +432,7 @@ void Event_Think(GOBJ *menu) {
         illusion_chance = ILLUSION_CHANCE_TO_LEDGE;
     }
     
-    bool can_upb = enabled(OPT_FF_LOW) | enabled(OPT_FF_MID) | enabled(OPT_FF_HIGH);
+    bool can_upb = Enabled(OPT_FF_LOW) | Enabled(OPT_FF_MID) | Enabled(OPT_FF_HIGH);
     
     float upb_distance = cpu_data->kind == FTKIND_FOX ?
         FIREFOX_DISTANCE : FIREBIRD_DISTANCE;
@@ -441,11 +441,11 @@ void Event_Think(GOBJ *menu) {
         // DI inwards
         cpu_data->cpu.lstickX = 90 * dir;
         cpu_data->cpu.lstickY = 90;
-    } else if (air_actionable(cpu)) {
+    } else if (IsAirActionable(cpu)) {
 
         // JUMP
         if (
-            enabled(OPT_JUMP)
+            Enabled(OPT_JUMP)
             && can_jump
             && (
                 // force jump if at end of range
@@ -460,7 +460,7 @@ void Event_Think(GOBJ *menu) {
             
         // ILLUSION
         } else if (
-            enabled(OPT_ILLUSION) && (
+            Enabled(OPT_ILLUSION) && (
                 // force illusion to ledge if no jump and cannot upb
                 (
                     !can_upb && !can_jump
@@ -497,7 +497,7 @@ void Event_Think(GOBJ *menu) {
             
         // FASTFALL
         } else if (
-            enabled(OPT_FASTFALL)
+            Enabled(OPT_FASTFALL)
             && !cpu_data->flags.is_fastfall
             && vel.Y < 0.f
             && HSD_Randi(FASTFALL_CHANCE) == 0
@@ -514,9 +514,9 @@ void Event_Think(GOBJ *menu) {
     } else if (0x161 <= state && state <= 0x162) {
         // compute firefox angle
         
-        int low = enabled(OPT_FF_LOW);
-        int mid = enabled(OPT_FF_MID);
-        int high = enabled(OPT_FF_HIGH);
+        int low = Enabled(OPT_FF_LOW);
+        int mid = Enabled(OPT_FF_MID);
+        int high = Enabled(OPT_FF_HIGH);
         int option_count = low + mid + high;
         int choice = HSD_Randi(option_count);
         
