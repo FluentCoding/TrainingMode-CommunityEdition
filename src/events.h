@@ -98,15 +98,15 @@ typedef struct EventPage
 } EventPage;
 typedef struct EventOption
 {
-    u8 option_kind;                                     // the type of option this is; string, integers, etc
+    u8 kind;                                     // the type of option this is; string, integers, etc
     u8 disable;                                         // boolean for disabling the option
     s16 value_min;                                      // number of values
     u16 value_num;                                      // number of values
-    s16 option_val;                                     // value of this option
+    s16 val;                                     // value of this option
     EventMenu *menu;                                    // pointer to the menu that pressing A opens
-    char *option_name;                                  // pointer to the name of this option
+    char *name;                                  // pointer to the name of this option
     char *desc;                                         // pointer to the description string for this option
-    void **option_values;                               // pointer to an array of strings
+    void **values;                               // pointer to an array of strings
     void (*onOptionChange)(GOBJ *menu_gobj, int value); // function that runs when option is changed
     void (*onOptionSelect)(GOBJ *menu_gobj);            // function that runs when option is selected
 } EventOption;
@@ -413,7 +413,7 @@ static int *eventDataBackup;
 static EventVars **event_vars_ptr = 0x803d7054; //R13 + (-0x4730)
 static EventVars *event_vars;
 
-// EventOption option_kind definitions
+// EventOption kind definitions
 #define OPTKIND_MENU 0
 #define OPTKIND_STRING 1
 #define OPTKIND_INT 2

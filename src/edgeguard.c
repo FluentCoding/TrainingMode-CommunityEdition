@@ -99,59 +99,59 @@ static AltText FalcoAltText[] = {
 
 static EventOption Options_Main[] = {
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Hit Strength",
+        .kind = OPTKIND_STRING,
+        .name = "Hit Strength",
         .desc = "How far Fox will be knocked back.",
-        .option_values = Values_HitStrength,
+        .values = Values_HitStrength,
         .value_num = countof(Values_HitStrength),
-        .option_val = 1
+        .val = 1
     },
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Firefox Low",
+        .kind = OPTKIND_STRING,
+        .name = "Firefox Low",
         .desc = "Allow Fox to aim his up special to the ledge.",
-        .option_values = OffOn,
+        .values = OffOn,
         .value_num = 2,
-        .option_val = 1,
+        .val = 1,
     },
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Firefox Mid",
+        .kind = OPTKIND_STRING,
+        .name = "Firefox Mid",
         .desc = "Allow Fox to aim his up special to the stage.",
-        .option_values = OffOn,
+        .values = OffOn,
         .value_num = 2,
     },
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Firefox High",
+        .kind = OPTKIND_STRING,
+        .name = "Firefox High",
         .desc = "Allow Fox to aim his up special high.",
-        .option_values = OffOn,
+        .values = OffOn,
         .value_num = 2,
     },
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Double Jump",
+        .kind = OPTKIND_STRING,
+        .name = "Double Jump",
         .desc = "Allow Fox to double jump.",
-        .option_values = OffOn,
+        .values = OffOn,
         .value_num = 2,
     },
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Illusion",
+        .kind = OPTKIND_STRING,
+        .name = "Illusion",
         .desc = "Allow Fox to side special.",
-        .option_values = OffOn,
+        .values = OffOn,
         .value_num = 2,
     },
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Fast Fall",
+        .kind = OPTKIND_STRING,
+        .name = "Fast Fall",
         .desc = "Allow Fox to fast fall.",
-        .option_values = OffOn,
+        .values = OffOn,
         .value_num = 2,
     },
     {
-        .option_kind = OPTKIND_FUNC,
-        .option_name = "Exit",
+        .kind = OPTKIND_FUNC,
+        .name = "Exit",
         .desc = "Return to the Event Select Screen.",
         .onOptionSelect = Exit,
     },
@@ -222,7 +222,7 @@ static float Vec2_Length(Vec2 *a) {
 }
 
 static bool enabled(int opt_idx) {
-    return Options_Main[opt_idx].option_val;
+    return Options_Main[opt_idx].val;
 }
 
 static int in_hitstun_anim(int state) {
@@ -310,7 +310,7 @@ void Reset(void) {
     Fighter_HitboxDisableAll(hmn);
     hmn_data->script.script_current = 0;
 
-    KBValues vals = HitStrength_KBRange[Options_Main[OPT_HITSTRENGTH].option_val];
+    KBValues vals = HitStrength_KBRange[Options_Main[OPT_HITSTRENGTH].val];
     
     float mag = vals.mag_min + (vals.mag_max - vals.mag_min) * HSD_Randf();
     
@@ -366,7 +366,7 @@ void Event_Init(GOBJ *gobj) {
         Menu_Main.name = "Falco Edgeguard";
         for (int i = 0; i < countof(FalcoAltText); ++i) {
             AltText *alt = &FalcoAltText[i];
-            Options_Main[i].option_name = alt->name;
+            Options_Main[i].name = alt->name;
             Options_Main[i].desc = alt->desc;
         } 
     }

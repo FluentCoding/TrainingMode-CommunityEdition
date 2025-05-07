@@ -3136,9 +3136,9 @@ void EventMenu_Update(GOBJ *gobj)
                     {
                         if (shortcut->option != 0) {
                             EventOption *option = shortcut->option;
-                            option->option_val = (option->option_val + 1) % option->value_num;
+                            option->val = (option->val + 1) % option->value_num;
                             if (option->onOptionChange)
-                                option->onOptionChange(stc_event_vars.menu_gobj, option->option_val);
+                                option->onOptionChange(stc_event_vars.menu_gobj, option->val);
                             SFX_PlayCommon(2);
                         }
 
@@ -3234,7 +3234,7 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
     s32 cursor_max = ((option_num > MENU_MAXOPTION) ? MENU_MAXOPTION : option_num) - 1;
 
     // get option variables
-    s16 option_val = currOption->option_val;
+    s16 val = currOption->val;
     s16 value_min = currOption->value_min;
     s16 value_max = value_min + currOption->value_num;
 
@@ -3311,11 +3311,11 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
     // check for left
     else if (((inputs & HSD_BUTTON_LEFT) != 0) || ((inputs & HSD_BUTTON_DPAD_LEFT) != 0))
     {
-        if ((currOption->option_kind == OPTKIND_STRING) || (currOption->option_kind == OPTKIND_INT) || (currOption->option_kind == OPTKIND_FLOAT))
+        if ((currOption->kind == OPTKIND_STRING) || (currOption->kind == OPTKIND_INT) || (currOption->kind == OPTKIND_FLOAT))
         {
 
-            option_val -= 1;
-            if (option_val >= value_min)
+            val -= 1;
+            if (val >= value_min)
             {
                 isChanged = 1;
 
@@ -3323,11 +3323,11 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
                 SFX_PlayCommon(2);
 
                 // update val
-                currOption->option_val = option_val;
+                currOption->val = val;
 
                 // run on change function if it exists
                 if (currOption->onOptionChange != 0)
-                    currOption->onOptionChange(gobj, currOption->option_val);
+                    currOption->onOptionChange(gobj, currOption->val);
             }
         }
     }
@@ -3335,10 +3335,10 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
     else if (((inputs & HSD_BUTTON_RIGHT) != 0) || ((inputs & HSD_BUTTON_DPAD_RIGHT) != 0))
     {
         // check for valid option kind
-        if ((currOption->option_kind == OPTKIND_STRING) || (currOption->option_kind == OPTKIND_INT) || (currOption->option_kind == OPTKIND_FLOAT))
+        if ((currOption->kind == OPTKIND_STRING) || (currOption->kind == OPTKIND_INT) || (currOption->kind == OPTKIND_FLOAT))
         {
-            option_val += 1;
-            if (option_val < value_max)
+            val += 1;
+            if (val < value_max)
             {
                 isChanged = 1;
 
@@ -3346,11 +3346,11 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
                 SFX_PlayCommon(2);
 
                 // update val
-                currOption->option_val = option_val;
+                currOption->val = val;
 
                 // run on change function if it exists
                 if (currOption->onOptionChange != 0)
-                    currOption->onOptionChange(gobj, currOption->option_val);
+                    currOption->onOptionChange(gobj, currOption->val);
             }
         }
     }
@@ -3359,7 +3359,7 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
     else if (inputs_rapid & HSD_BUTTON_A)
     {
         // check to advance a menu
-        if ((currOption->option_kind == OPTKIND_MENU))
+        if ((currOption->kind == OPTKIND_MENU))
         {
             // access this menu
             currMenu->state = EMSTATE_OPENSUB;
@@ -3383,14 +3383,14 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
 
         /*
         // check to create a popup
-        if ((currOption->option_kind == OPTKIND_STRING) || (currOption->option_kind == OPTKIND_INT))
+        if ((currOption->kind == OPTKIND_STRING) || (currOption->kind == OPTKIND_INT))
         {
             // access this menu
             currMenu->state = EMSTATE_OPENPOP;
 
             // init cursor and scroll value
             s32 cursor = 0;
-            s32 scroll = currOption->option_val;
+            s32 scroll = currOption->val;
 
             // correct scroll
             s32 max_scroll;
@@ -3420,7 +3420,7 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
         */
 
         // check to run a function
-        if (currOption->option_kind == OPTKIND_FUNC && currOption->onOptionSelect != 0)
+        if (currOption->kind == OPTKIND_FUNC && currOption->onOptionSelect != 0)
         {
             // execute function
             currOption->onOptionSelect(gobj);
@@ -3601,12 +3601,12 @@ void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu)
     else if ((inputs_rapid & HSD_BUTTON_A) != 0)
     {
 
-        // update option_val
-        currOption->option_val = cursor + scroll;
+        // update val
+        currOption->val = cursor + scroll;
 
         // run on change function if it exists
         if (currOption->onOptionChange != 0)
-            currOption->onOptionChange(gobj, currOption->option_val);
+            currOption->onOptionChange(gobj, currOption->val);
 
         EventMenu_DestroyPopup(gobj);
 
@@ -3994,8 +3994,8 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu)
         EventOption *currOption = &menu->options[scroll + i];
 
         // output option name
-        int optionVal = currOption->option_val;
-        char *str = currOption->option_name ? currOption->option_name : "";
+        int optionVal = currOption->val;
+        char *str = currOption->name ? currOption->name : "";
         Text_SetText(text, i, str);
 
         // output color
@@ -4027,34 +4027,34 @@ void EventMenu_UpdateText(GOBJ *gobj, EventMenu *menu)
     {
         // get this option
         EventOption *currOption = &menu->options[scroll + i];
-        int optionVal = currOption->option_val;
+        int optionVal = currOption->val;
 
         // hide row models
         JOBJ_SetFlags(menuData->row_joints[i][0], JOBJ_HIDDEN);
         JOBJ_SetFlags(menuData->row_joints[i][1], JOBJ_HIDDEN);
 
         // if this option has string values
-        if (currOption->option_kind == OPTKIND_STRING)
+        if (currOption->kind == OPTKIND_STRING)
         {
             // output option value
-            Text_SetText(text, i, currOption->option_values[optionVal]);
+            Text_SetText(text, i, currOption->values[optionVal]);
 
             // show box
             JOBJ_ClearFlags(menuData->row_joints[i][0], JOBJ_HIDDEN);
         }
 
         // if this option has int values
-        else if (currOption->option_kind == OPTKIND_INT)
+        else if (currOption->kind == OPTKIND_INT)
         {
             // output option value
-            Text_SetText(text, i, currOption->option_values, optionVal);
+            Text_SetText(text, i, currOption->values, optionVal);
 
             // show box
             JOBJ_ClearFlags(menuData->row_joints[i][0], JOBJ_HIDDEN);
         }
 
         // if this option is a menu or function
-        else if ((currOption->option_kind == OPTKIND_MENU) || (currOption->option_kind == OPTKIND_FUNC))
+        else if ((currOption->kind == OPTKIND_MENU) || (currOption->kind == OPTKIND_FUNC))
         {
             Text_SetText(text, i, &nullString);
 
@@ -4281,7 +4281,7 @@ void EventMenu_UpdatePopupText(GOBJ *gobj, EventOption *option)
     Text *text = menuData->text_popup;
 
     // update int list
-    if (option->option_kind == OPTKIND_INT)
+    if (option->kind == OPTKIND_INT)
     {
         // Output all values
         for (int i = 0; i < value_num; i++)
@@ -4292,13 +4292,13 @@ void EventMenu_UpdatePopupText(GOBJ *gobj, EventOption *option)
     }
 
     // update string list
-    else if (option->option_kind == OPTKIND_STRING)
+    else if (option->kind == OPTKIND_STRING)
     {
         // Output all values
         for (int i = 0; i < value_num; i++)
         {
             // output option value
-            Text_SetText(text, i, option->option_values[scroll + i]);
+            Text_SetText(text, i, option->values[scroll + i]);
         }
     }
 

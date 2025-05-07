@@ -7,57 +7,57 @@ static char **LcOptions_HUD[] = {"On", "Off"};
 static EventOption LcOptions_Main[] = {
     // Target
     {
-        .option_kind = OPTKIND_STRING,                                            // the type of option this is; menu, string list, integers list, etc
+        .kind = OPTKIND_STRING,                                            // the type of option this is; menu, string list, integers list, etc
         .value_num = sizeof(LcOptions_Barrel) / 4,                                // number of values for this option
-        .option_val = 0,                                                          // value of this option
+        .val = 0,                                                          // value of this option
         .menu = 0,                                                                // pointer to the menu that pressing A opens
-        .option_name = "Target",                                                  // pointer to a string
+        .name = "Target",                                                  // pointer to a string
         .desc = "Enable a target to attack. Use DPad down to\nmanually move it.", // string describing what this option does
-        .option_values = LcOptions_Barrel,                                        // pointer to an array of strings
+        .values = LcOptions_Barrel,                                        // pointer to an array of strings
         .onOptionChange = 0,
     },
     // HUD
     {
-        .option_kind = OPTKIND_STRING,           // the type of option this is; menu, string list, integers list, etc
+        .kind = OPTKIND_STRING,           // the type of option this is; menu, string list, integers list, etc
         .value_num = sizeof(LcOptions_HUD) / 4,  // number of values for this option
-        .option_val = 0,                         // value of this option
+        .val = 0,                         // value of this option
         .menu = 0,                               // pointer to the menu that pressing A opens
-        .option_name = "HUD",                    // pointer to a string
+        .name = "HUD",                    // pointer to a string
         .desc = "Toggle visibility of the HUD.", // string describing what this option does
-        .option_values = LcOptions_HUD,          // pointer to an array of strings
+        .values = LcOptions_HUD,          // pointer to an array of strings
         .onOptionChange = 0,
     },
     // Tips
     {
-        .option_kind = OPTKIND_STRING,                  // the type of option this is; menu, string list, integers list, etc
+        .kind = OPTKIND_STRING,                  // the type of option this is; menu, string list, integers list, etc
         .value_num = sizeof(LcOptions_HUD) / 4,         // number of values for this option
-        .option_val = 0,                                // value of this option
+        .val = 0,                                // value of this option
         .menu = 0,                                      // pointer to the menu that pressing A opens
-        .option_name = "Tips",                          // pointer to a string
+        .name = "Tips",                          // pointer to a string
         .desc = "Toggle the onscreen display of tips.", // string describing what this option does
-        .option_values = LcOptions_HUD,                 // pointer to an array of strings
+        .values = LcOptions_HUD,                 // pointer to an array of strings
         .onOptionChange = Tips_Toggle,
     },
     // Help
     {
-        .option_kind = OPTKIND_FUNC,                                                                                                                                                                                       // the type of option this is; menu, string list, integers list, etc
+        .kind = OPTKIND_FUNC,                                                                                                                                                                                       // the type of option this is; menu, string list, integers list, etc
         .value_num = 0,                                                                                                                                                                                                    // number of values for this option
-        .option_val = 0,                                                                                                                                                                                                   // value of this option
+        .val = 0,                                                                                                                                                                                                   // value of this option
         .menu = 0,                                                                                                                                                                                                         // pointer to the menu that pressing A opens
-        .option_name = "Help",                                                                                                                                                                                             // pointer to a string
+        .name = "Help",                                                                                                                                                                                             // pointer to a string
         .desc = "L-canceling is performed by pressing L, R, or Z up to \n7 frames before landing from a non-special aerial\nattack. This will cut the landing lag in half, allowing \nyou to act sooner after attacking.", // string describing what this option does
-        .option_values = 0,                                                                                                                                                                                                // pointer to an array of strings
+        .values = 0,                                                                                                                                                                                                // pointer to an array of strings
         .onOptionChange = 0,
     },
     // Exit
     {
-        .option_kind = OPTKIND_FUNC,                     // the type of option this is; menu, string list, integers list, etc
+        .kind = OPTKIND_FUNC,                     // the type of option this is; menu, string list, integers list, etc
         .value_num = 0,                                  // number of values for this option
-        .option_val = 0,                                 // value of this option
+        .val = 0,                                 // value of this option
         .menu = 0,                                       // pointer to the menu that pressing A opens
-        .option_name = "Exit",                           // pointer to a string
+        .name = "Exit",                           // pointer to a string
         .desc = "Return to the Event Selection Screen.", // string describing what this option does
-        .option_values = 0,                              // pointer to an array of strings
+        .values = 0,                              // pointer to an array of strings
         .onOptionChange = 0,
         .onOptionSelect = Event_Exit,
     },
@@ -343,7 +343,7 @@ void LCancel_HUDCamThink(GOBJ *gobj)
 {
 
     // if HUD enabled and not paused
-    if ((LcOptions_Main[1].option_val == 0) && (Pause_CheckStatus(1) != 2))
+    if ((LcOptions_Main[1].val == 0) && (Pause_CheckStatus(1) != 2))
     {
         CObjThink_Common(gobj);
     }
@@ -359,7 +359,7 @@ void Tips_Toggle(GOBJ *menu_gobj, int value)
 void Tips_Think(LCancelData *event_data, FighterData *hmn_data)
 {
 
-    if (LcOptions_Main[2].option_val == 0)
+    if (LcOptions_Main[2].val == 0)
     {
         // shield tip
         if (event_data->tip.shield_isdisp == 0) // if not shown
@@ -510,7 +510,7 @@ void Barrel_Think(LCancelData *event_data)
 {
     GOBJ *barrel_gobj = event_data->barrel_gobj;
 
-    switch (LcOptions_Main[0].option_val)
+    switch (LcOptions_Main[0].val)
     {
     case (0): // off
     {
@@ -740,7 +740,7 @@ int Barrel_OnHurt(GOBJ *barrel_gobj)
     // get event data
     LCancelData *event_data = event_vars->event_gobj->userdata;
 
-    switch (LcOptions_Main[0].option_val)
+    switch (LcOptions_Main[0].val)
     {
     case (0): // off
     {
