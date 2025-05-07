@@ -81,17 +81,17 @@ enum custom_asid_groups
 
 // FUNCTION PROTOTYPES ##############################################################
 
-static u32 lz77_compress(u8 *uncompressed_text, u32 uncompressed_size, u8 *compressed_text, u8 pointer_length_width);
-static u32 lz77_decompress(u8 *compressed_text, u8 *uncompressed_text);
-static float get_angle_out_of_deadzone(float angle, int lastSDIWasCardinal);
-static void distribute_chances(u16 *chances[], unsigned int chance_count);
-static void rebound_chances(u16 *chances[], unsigned int chance_count, int just_changed_option);
-static int is_tech_anim(int state);
-static bool can_walljump(GOBJ* fighter);
+static u32 lz77Compress(u8 *uncompressed_text, u32 uncompressed_size, u8 *compressed_text, u8 pointer_length_width);
+static u32 lz77Decompress(u8 *compressed_text, u8 *uncompressed_text);
+static float GetAngleOutOfDeadzone(float angle, int lastSDIWasCardinal);
+static void DistributeChances(u16 *chances[], unsigned int chance_count);
+static void ReboundChances(u16 *chances[], unsigned int chance_count, int just_changed_option);
+static int IsTechAnim(int state);
+static bool CanWalljump(GOBJ* fighter);
 static int GetCurrentStateName(GOBJ *fighter, char *buf);
-static bool check_has_jump(GOBJ *g);
-static int in_hitstun_anim(int state);
-static int is_hitlag_victim(GOBJ *character);
+static bool CheckHasJump(GOBJ *g);
+static int InHitstunAnim(int state);
+static int IsHitlagVictim(GOBJ *character);
 void CustomTDI_Update(GOBJ *gobj);
 void CustomTDI_Destroy(GOBJ *gobj);
 void CustomTDI_Apply(GOBJ *cpu, GOBJ *hmn, CustomTDI *di);
@@ -461,7 +461,7 @@ static CPUAction Lab_CPUActionJumpNeutral[] = {
         .input     = PAD_BUTTON_X,
         .isLast    = 1,
         .stickDir  = STCKDIR_NONE,
-        .custom_check = check_has_jump,
+        .custom_check = CheckHasJump,
     },
 
     // wiggle out if we can't jump

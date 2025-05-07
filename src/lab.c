@@ -376,21 +376,21 @@ void Lab_ChangeGetup(GOBJ *menu_gobj, int value)
     LabOptions_Tech[OPTTECH_GETUPATTACKCHANCE].disable = value == 0 ? 0 : 1;
 }
 
-static int tech_option_menu_lookup[4] = {
+static int MenuLookup_TechOption[4] = {
     OPTTECH_TECHINPLACECHANCE,
     OPTTECH_TECHAWAYCHANCE,
     OPTTECH_TECHTOWARDCHANCE,
     OPTTECH_MISSTECHCHANCE,
 };
 
-static int getup_option_menu_lookup[4] = {
+static int MenuLookup_GetupOption[4] = {
     OPTTECH_GETUPSTANDCHANCE,
     OPTTECH_GETUPAWAYCHANCE,
     OPTTECH_GETUPTOWARDCHANCE,
     OPTTECH_GETUPATTACKCHANCE,
 };
 
-static void rebound_tech_chances(EventOption tech_menu[4], int menu_lookup[], int slot_idx_changed) {
+static void ReboundTechChances(EventOption tech_menu[4], int menu_lookup[], int slot_idx_changed) {
     u16 *chances[4];
     int enabled_slots = 0;
 
@@ -400,20 +400,20 @@ static void rebound_tech_chances(EventOption tech_menu[4], int menu_lookup[], in
         enabled_slots++;
     }
 
-    rebound_chances(chances, 4, slot_idx_changed);
+    ReboundChances(chances, 4, slot_idx_changed);
 }
 
-void Lab_ChangeTechInPlaceChance (GOBJ *menu_gobj, int _new_val) { rebound_tech_chances(LabOptions_Tech, tech_option_menu_lookup, 0); }
-void Lab_ChangeTechAwayChance    (GOBJ *menu_gobj, int _new_val) { rebound_tech_chances(LabOptions_Tech, tech_option_menu_lookup, 1); }
-void Lab_ChangeTechTowardChance  (GOBJ *menu_gobj, int _new_val) { rebound_tech_chances(LabOptions_Tech, tech_option_menu_lookup, 2); }
-void Lab_ChangeMissTechChance    (GOBJ *menu_gobj, int _new_val) { rebound_tech_chances(LabOptions_Tech, tech_option_menu_lookup, 3); }
+void Lab_ChangeTechInPlaceChance (GOBJ *menu_gobj, int _new_val) { ReboundTechChances(LabOptions_Tech, MenuLookup_TechOption, 0); }
+void Lab_ChangeTechAwayChance    (GOBJ *menu_gobj, int _new_val) { ReboundTechChances(LabOptions_Tech, MenuLookup_TechOption, 1); }
+void Lab_ChangeTechTowardChance  (GOBJ *menu_gobj, int _new_val) { ReboundTechChances(LabOptions_Tech, MenuLookup_TechOption, 2); }
+void Lab_ChangeMissTechChance    (GOBJ *menu_gobj, int _new_val) { ReboundTechChances(LabOptions_Tech, MenuLookup_TechOption, 3); }
 
-void Lab_ChangeStandChance       (GOBJ *menu_gobj, int _new_val) { rebound_tech_chances(LabOptions_Tech, getup_option_menu_lookup, 0); }
-void Lab_ChangeRollAwayChance    (GOBJ *menu_gobj, int _new_val) { rebound_tech_chances(LabOptions_Tech, getup_option_menu_lookup, 1); }
-void Lab_ChangeRollTowardChance  (GOBJ *menu_gobj, int _new_val) { rebound_tech_chances(LabOptions_Tech, getup_option_menu_lookup, 2); }
-void Lab_ChangeGetupAttackChance (GOBJ *menu_gobj, int _new_val) { rebound_tech_chances(LabOptions_Tech, getup_option_menu_lookup, 3); }
+void Lab_ChangeStandChance       (GOBJ *menu_gobj, int _new_val) { ReboundTechChances(LabOptions_Tech, MenuLookup_GetupOption, 0); }
+void Lab_ChangeRollAwayChance    (GOBJ *menu_gobj, int _new_val) { ReboundTechChances(LabOptions_Tech, MenuLookup_GetupOption, 1); }
+void Lab_ChangeRollTowardChance  (GOBJ *menu_gobj, int _new_val) { ReboundTechChances(LabOptions_Tech, MenuLookup_GetupOption, 2); }
+void Lab_ChangeGetupAttackChance (GOBJ *menu_gobj, int _new_val) { ReboundTechChances(LabOptions_Tech, MenuLookup_GetupOption, 3); }
 
-static int enabled_slot_chances(EventOption slot_menu[REC_SLOTS], u16 *chances[REC_SLOTS]) {
+static int EnabledSlotChances(EventOption slot_menu[REC_SLOTS], u16 *chances[REC_SLOTS]) {
     int enabled_slots = 0;
     for (int i = 0; i < REC_SLOTS; i++) {
         int slot_menu_idx = OPTSLOTCHANCE_1 + i;
@@ -427,25 +427,25 @@ static int enabled_slot_chances(EventOption slot_menu[REC_SLOTS], u16 *chances[R
     return enabled_slots;
 }
 
-static void rebound_slot_chances(EventOption slot_menu[REC_SLOTS], int slot_idx_changed) {
+static void ReboundSlotChances(EventOption slot_menu[REC_SLOTS], int slot_idx_changed) {
     u16 *chances[REC_SLOTS];
-    int chance_count = enabled_slot_chances(slot_menu, chances);
-    rebound_chances(chances, chance_count, slot_idx_changed);
+    int chance_count = EnabledSlotChances(slot_menu, chances);
+    ReboundChances(chances, chance_count, slot_idx_changed);
 }
 
-void Lab_ChangeSlot1ChanceHMN (GOBJ *menu_gobj, int _new_val) { rebound_slot_chances(LabOptions_SlotChancesHMN, 0); }
-void Lab_ChangeSlot2ChanceHMN (GOBJ *menu_gobj, int _new_val) { rebound_slot_chances(LabOptions_SlotChancesHMN, 1); }
-void Lab_ChangeSlot3ChanceHMN (GOBJ *menu_gobj, int _new_val) { rebound_slot_chances(LabOptions_SlotChancesHMN, 2); }
-void Lab_ChangeSlot4ChanceHMN (GOBJ *menu_gobj, int _new_val) { rebound_slot_chances(LabOptions_SlotChancesHMN, 3); }
-void Lab_ChangeSlot5ChanceHMN (GOBJ *menu_gobj, int _new_val) { rebound_slot_chances(LabOptions_SlotChancesHMN, 4); }
-void Lab_ChangeSlot6ChanceHMN (GOBJ *menu_gobj, int _new_val) { rebound_slot_chances(LabOptions_SlotChancesHMN, 5); }
+void Lab_ChangeSlot1ChanceHMN (GOBJ *menu_gobj, int _new_val) { ReboundSlotChances(LabOptions_SlotChancesHMN, 0); }
+void Lab_ChangeSlot2ChanceHMN (GOBJ *menu_gobj, int _new_val) { ReboundSlotChances(LabOptions_SlotChancesHMN, 1); }
+void Lab_ChangeSlot3ChanceHMN (GOBJ *menu_gobj, int _new_val) { ReboundSlotChances(LabOptions_SlotChancesHMN, 2); }
+void Lab_ChangeSlot4ChanceHMN (GOBJ *menu_gobj, int _new_val) { ReboundSlotChances(LabOptions_SlotChancesHMN, 3); }
+void Lab_ChangeSlot5ChanceHMN (GOBJ *menu_gobj, int _new_val) { ReboundSlotChances(LabOptions_SlotChancesHMN, 4); }
+void Lab_ChangeSlot6ChanceHMN (GOBJ *menu_gobj, int _new_val) { ReboundSlotChances(LabOptions_SlotChancesHMN, 5); }
 
-void Lab_ChangeSlot1ChanceCPU (GOBJ *menu_gobj, int _new_val) { rebound_slot_chances(LabOptions_SlotChancesCPU, 0); }
-void Lab_ChangeSlot2ChanceCPU (GOBJ *menu_gobj, int _new_val) { rebound_slot_chances(LabOptions_SlotChancesCPU, 1); }
-void Lab_ChangeSlot3ChanceCPU (GOBJ *menu_gobj, int _new_val) { rebound_slot_chances(LabOptions_SlotChancesCPU, 2); }
-void Lab_ChangeSlot4ChanceCPU (GOBJ *menu_gobj, int _new_val) { rebound_slot_chances(LabOptions_SlotChancesCPU, 3); }
-void Lab_ChangeSlot5ChanceCPU (GOBJ *menu_gobj, int _new_val) { rebound_slot_chances(LabOptions_SlotChancesCPU, 4); }
-void Lab_ChangeSlot6ChanceCPU (GOBJ *menu_gobj, int _new_val) { rebound_slot_chances(LabOptions_SlotChancesCPU, 5); }
+void Lab_ChangeSlot1ChanceCPU (GOBJ *menu_gobj, int _new_val) { ReboundSlotChances(LabOptions_SlotChancesCPU, 0); }
+void Lab_ChangeSlot2ChanceCPU (GOBJ *menu_gobj, int _new_val) { ReboundSlotChances(LabOptions_SlotChancesCPU, 1); }
+void Lab_ChangeSlot3ChanceCPU (GOBJ *menu_gobj, int _new_val) { ReboundSlotChances(LabOptions_SlotChancesCPU, 2); }
+void Lab_ChangeSlot4ChanceCPU (GOBJ *menu_gobj, int _new_val) { ReboundSlotChances(LabOptions_SlotChancesCPU, 3); }
+void Lab_ChangeSlot5ChanceCPU (GOBJ *menu_gobj, int _new_val) { ReboundSlotChances(LabOptions_SlotChancesCPU, 4); }
+void Lab_ChangeSlot6ChanceCPU (GOBJ *menu_gobj, int _new_val) { ReboundSlotChances(LabOptions_SlotChancesCPU, 5); }
 
 void Lab_ChangeCPUIntang(GOBJ *menu_gobj, int value)
 {
@@ -936,7 +936,7 @@ void InfoDisplay_Update(GOBJ *menu_gobj, EventOption menu[], GOBJ *fighter, GOBJ
                 {
                     // no boolean specifier in c
                     const char *str;
-                    if (can_walljump(fighter))
+                    if (CanWalljump(fighter))
                         str = "Can Walljump: true";
                     else
                         str = "Can Walljump: false";
@@ -1026,17 +1026,17 @@ float Fighter_GetOpponentDir(FighterData *from, FighterData *to)
     return dir;
 }
 
-static int is_hitlag_victim(GOBJ *character) {
+static int IsHitlagVictim(GOBJ *character) {
     FighterData *data = character->userdata;
     int state = data->state_id;
-    return data->flags.hitlag && (in_hitstun_anim(state) || state == ASID_GUARDSETOFF);
+    return data->flags.hitlag && (InHitstunAnim(state) || state == ASID_GUARDSETOFF);
 }
 
-static int in_hitstun_anim(int state) {
+static int InHitstunAnim(int state) {
     return ASID_DAMAGEHI1 <= state && state <= ASID_DAMAGEFLYROLL;
 }
 
-static int hitstun_ended(GOBJ *character) {
+static int HitstunEnded(GOBJ *character) {
     FighterData *data = character->userdata;
     float hitstun = *((float*)&data->state_var.state_var1);
     return hitstun == 0.0;
@@ -1046,7 +1046,7 @@ static int in_tumble_anim(int state) {
     return state == ASID_DAMAGEFALL || (ASID_DAMAGEFLYHI <= state && state <= ASID_DAMAGEFLYROLL);
 }
 
-static int check_IASA(FighterData *data) {
+static int CheckIASA(FighterData *data) {
     // For some reason, the iasa flag isn't reset when the state changes, only when a new action that has iasa starts.
     // So we need to do some bs tracking to figure out if the character is in iasa.
     return data->TM.iasa_frames && data->TM.iasa_frames <= data->TM.state_frame;
@@ -1063,13 +1063,13 @@ static int CheckOverlay(GOBJ *character, OverlayGroup overlay)
     {
         case (OVERLAY_ACTIONABLE):
         {
-            if (in_hitstun_anim(state) && hitstun_ended(character))
+            if (InHitstunAnim(state) && HitstunEnded(character))
                 return true;
 
             if (state == ASID_LANDING && data->state.frame >= data->attr.normal_landing_lag)
                 return true;
 
-            if (check_IASA(data)) return true;
+            if (CheckIASA(data)) return true;
 
             if (state == ASID_CLIFFWAIT && data->TM.state_frame > 1) return true;
 
@@ -1085,7 +1085,7 @@ static int CheckOverlay(GOBJ *character, OverlayGroup overlay)
         }
 
         case (OVERLAY_HITSTUN):
-            return in_hitstun_anim(state) && !hitstun_ended(character);
+            return InHitstunAnim(state) && !HitstunEnded(character);
 
         case (OVERLAY_LEDGE_ACTIONABLE):
             return state == ASID_CLIFFWAIT && data->TM.state_frame > 1;
@@ -1106,7 +1106,7 @@ static int CheckOverlay(GOBJ *character, OverlayGroup overlay)
             if (!in_air)
                 return false;
 
-            if (in_hitstun_anim(state) && !hitstun_ended(character))
+            if (InHitstunAnim(state) && !HitstunEnded(character))
                 return false;
 
             if ((state < ASID_JUMPF || state > ASID_DAMAGEFALL)
@@ -1148,7 +1148,7 @@ static int CheckOverlay(GOBJ *character, OverlayGroup overlay)
             return state >= ASID_SQUAT && state <= ASID_SQUATRV;
 
         case (OVERLAY_WAIT):
-            return check_IASA(data)
+            return CheckIASA(data)
                 || state == ASID_WAIT
                 || state == ASID_CATCHWAIT
                 || state == ASID_SQUATWAIT;
@@ -1181,7 +1181,7 @@ static int CheckOverlay(GOBJ *character, OverlayGroup overlay)
         }
 
         case (OVERLAY_IASA):
-            return check_IASA(data);
+            return CheckIASA(data);
     }
 
     char * err = HSD_MemAlloc(64);
@@ -1203,8 +1203,8 @@ int CPUAction_CheckASID(GOBJ *cpu, int asid_kind)
         case (ASID_ANY): return true;
         case (ASID_DAMAGEAIR):
             return in_air
-                && (in_hitstun_anim(cpu_state) || cpu_state == ASID_DAMAGEFALL)
-                && hitstun_ended(cpu);
+                && (InHitstunAnim(cpu_state) || cpu_state == ASID_DAMAGEFALL)
+                && HitstunEnded(cpu);
 
         case (ASID_ACTIONABLE):
         {
@@ -1220,7 +1220,7 @@ int CPUAction_CheckASID(GOBJ *cpu, int asid_kind)
             if (!in_air)
                 return false;
 
-            if (in_hitstun_anim(cpu_state) && hitstun_ended(cpu))
+            if (InHitstunAnim(cpu_state) && HitstunEnded(cpu))
                 return true;
 
             return cpu_state == ASID_JUMPF 
@@ -1241,7 +1241,7 @@ int CPUAction_CheckASID(GOBJ *cpu, int asid_kind)
             if (in_air)
                 return false;
 
-            if (in_hitstun_anim(cpu_state) && hitstun_ended(cpu))
+            if (InHitstunAnim(cpu_state) && HitstunEnded(cpu))
                 return true;
 
             if (cpu_state == ASID_LANDING && cpu_data->state.frame >= cpu_data->attr.normal_landing_lag)
@@ -1791,7 +1791,7 @@ void CPUThink(GOBJ *event, GOBJ *hmn, GOBJ *cpu)
                     angle = HSD_Randi(360) * M_1DEGREE;
                     magnitude = 0.49 + (HSD_Randf() * 0.51);
 
-                    angle = get_angle_out_of_deadzone(angle, lastSDIWasCardinal);
+                    angle = GetAngleOutOfDeadzone(angle, lastSDIWasCardinal);
                 }
 
                 break;
@@ -3498,7 +3498,7 @@ void Record_CopySlot(GOBJ *menu_gobj) {
     }
 
     chances[target_slot].disable = chances[copy_slot].disable;
-    rebound_slot_chances(chances, target_slot);
+    ReboundSlotChances(chances, target_slot);
     memcpy(data[target_slot], data[copy_slot], sizeof(RecInputData));
 }
 
@@ -3516,7 +3516,7 @@ void Record_DeleteSlot(GOBJ *menu_gobj) {
         chances = LabOptions_SlotChancesCPU;
     }
     chances[delete_slot].disable = 1;
-    rebound_slot_chances(chances, delete_slot);
+    ReboundSlotChances(chances, delete_slot);
     data[delete_slot]->start_frame = -1;
     data[delete_slot]->num = 0;
 }
@@ -4173,7 +4173,7 @@ void Record_ChangeMirroredPlayback(GOBJ *menu_gobj, int value)
 int Record_GetRandomSlot(RecInputData **input_data, EventOption slot_menu[])
 {
     u16 *chances[REC_SLOTS];
-    int chance_count = enabled_slot_chances(slot_menu, chances);
+    int chance_count = EnabledSlotChances(slot_menu, chances);
     if (chance_count == 0) return 0;
 
     int slots[REC_SLOTS];
@@ -4404,7 +4404,7 @@ void Record_MemcardLoad(int slot, int file_no)
 
             // decompress
             RecordingSave *loaded_recsave = calloc(sizeof(RecordingSave) * 1.06);
-            lz77_decompress(compressed_recording, loaded_recsave);
+            lz77Decompress(compressed_recording, loaded_recsave);
 
             // copy buffer to savestate
             memcpy(rec_state, &loaded_recsave->savestate, sizeof(Savestate));
@@ -5741,7 +5741,7 @@ int Export_Compress(u8 *dest, u8 *source, u32 size)
 {
 
     int pre_tick = OSGetTick();
-    int compress_size = lz77_compress(source, size, dest, 8);
+    int compress_size = lz77Compress(source, size, dest, 8);
     int post_tick = OSGetTick();
     int time_dif = OSTicksToMilliseconds(post_tick - pre_tick);
     return compress_size;
@@ -6214,7 +6214,7 @@ void Event_Think_LabState_Normal(GOBJ *event) {
             break;
         case PLAYBACKCOUNTER_ON_HIT_CPU:
             if (!stc_playback_cancelled_cpu) {
-                if (is_hitlag_victim(cpu) && eventData->cpu_lasthit != cpu_data->dmg.atk_instance_hurtby) {
+                if (IsHitlagVictim(cpu) && eventData->cpu_lasthit != cpu_data->dmg.atk_instance_hurtby) {
                     eventData->cpu_countertimer = 0;
                     eventData->cpu_hitnum++;
                     eventData->cpu_lasthit = cpu_data->dmg.atk_instance_hurtby;
@@ -6225,17 +6225,17 @@ void Event_Think_LabState_Normal(GOBJ *event) {
                 if (!info.disable) {
                     stc_playback_cancelled_cpu = true;
                     eventData->cpu_state = CPUSTATE_COUNTER;
-                } else if (!in_hitstun_anim(cpu) || hitstun_ended(cpu)) {
+                } else if (!InHitstunAnim(cpu) || HitstunEnded(cpu)) {
                     eventData->cpu_countertimer++;
                 }
             }
 
             break;
         case PLAYBACKCOUNTER_ON_HIT_HMN:
-            stc_playback_cancelled_cpu |= is_hitlag_victim(hmn);
+            stc_playback_cancelled_cpu |= IsHitlagVictim(hmn);
             break;
         case PLAYBACKCOUNTER_ON_HIT_EITHER:
-            stc_playback_cancelled_cpu |= is_hitlag_victim(cpu) || is_hitlag_victim(hmn);
+            stc_playback_cancelled_cpu |= IsHitlagVictim(cpu) || IsHitlagVictim(hmn);
             break;
         }
 
@@ -6293,13 +6293,13 @@ void Event_Think_LabState_Normal(GOBJ *event) {
 
         if (rec_data.hmn_inputs[i]->num != 0 && LabOptions_SlotChancesHMN[slot_menu_idx].disable) {
             u16 *chances[REC_SLOTS];
-            int chance_count = enabled_slot_chances(LabOptions_SlotChancesHMN, chances);
+            int chance_count = EnabledSlotChances(LabOptions_SlotChancesHMN, chances);
 
             LabOptions_SlotChancesHMN[slot_menu_idx].disable = 0;
             if (chance_count) {
                 LabOptions_SlotChancesHMN[slot_menu_idx].val = 100 / chance_count;
                 chances[chance_count++] = &LabOptions_SlotChancesHMN[slot_menu_idx].val;
-                distribute_chances(chances, chance_count);
+                DistributeChances(chances, chance_count);
             } else {
                 LabOptions_SlotChancesHMN[slot_menu_idx].val = 100;
             }
@@ -6307,13 +6307,13 @@ void Event_Think_LabState_Normal(GOBJ *event) {
 
         if (rec_data.cpu_inputs[i]->num != 0 && LabOptions_SlotChancesCPU[slot_menu_idx].disable) {
             u16 *chances[REC_SLOTS];
-            int chance_count = enabled_slot_chances(LabOptions_SlotChancesCPU, chances);
+            int chance_count = EnabledSlotChances(LabOptions_SlotChancesCPU, chances);
 
             LabOptions_SlotChancesCPU[slot_menu_idx].disable = 0;
             if (chance_count) {
                 LabOptions_SlotChancesCPU[slot_menu_idx].val = 100 / chance_count;
                 chances[chance_count++] = &LabOptions_SlotChancesCPU[slot_menu_idx].val;
-                distribute_chances(chances, chance_count);
+                DistributeChances(chances, chance_count);
             } else {
                 LabOptions_SlotChancesCPU[slot_menu_idx].val = 100;
             }
@@ -6404,7 +6404,7 @@ void Event_Think(GOBJ *event)
     // apply invisibility
     int invisible = LabOptions_Tech[OPTTECH_INVISIBLE].val;
     if (invisible) {
-        if (is_tech_anim(cpu_data->state_id))
+        if (IsTechAnim(cpu_data->state_id))
         {
             // get distinguishable frame from lookup table
             int char_id = cpu_data->kind;
@@ -6541,12 +6541,12 @@ EventMenu *Event_Menu = &LabMenu_Main;
 
 // helper fns ######################################################
 
-static int is_tech_anim(int state) {
+static int IsTechAnim(int state) {
     return state == ASID_PASSIVE || state == ASID_PASSIVESTANDF || state == ASID_PASSIVESTANDB;
 }
 
 // Clean up percentages so the total is 100, evenly distributing the change.
-static void distribute_chances(u16 *chances[], unsigned int chance_count) {
+static void DistributeChances(u16 *chances[], unsigned int chance_count) {
     if (chance_count == 0) return;
 
     int sum = 0;
@@ -6592,7 +6592,7 @@ static void distribute_chances(u16 *chances[], unsigned int chance_count) {
 
 // Clean up percentages so the total is always 100.
 // The next percentage is modified.
-static void rebound_chances(u16 *chances[], unsigned int chance_count, int just_changed_option) {
+static void ReboundChances(u16 *chances[], unsigned int chance_count, int just_changed_option) {
     if (chance_count == 0) return;
 
     int sum = 0;
@@ -6624,7 +6624,7 @@ static void rebound_chances(u16 *chances[], unsigned int chance_count, int just_
     }
 }
 
-static float get_angle_out_of_deadzone(float angle, int lastSDIWasCardinal)
+static float GetAngleOutOfDeadzone(float angle, int lastSDIWasCardinal)
 {
     // get out of deadzone if last sdi was cardinal
     if (angle > M_1DEGREE * 73.5 || angle < M_1DEGREE * 106.5 && lastSDIWasCardinal)
@@ -6646,25 +6646,22 @@ static float get_angle_out_of_deadzone(float angle, int lastSDIWasCardinal)
     return angle;
 }
 
-// lz77 functions credited to https://github.com/andyherbert/lz1
-static int x_to_the_n(int x, int n)
+static int pow_n(int x, int n)
 {
-    int i; /* Variable used in loop counter */
-    int number = 1;
-
-    for (i = 0; i < n; ++i)
-        number *= x;
-
-    return (number);
+    int res = 1;
+    for (; n; n--)
+        res *= x;
+    return res;
 }
 
-static u32 lz77_compress(u8 *uncompressed_text, u32 uncompressed_size, u8 *compressed_text, u8 pointer_length_width)
+// lz77 functions credited to https://github.com/andyherbert/lz1
+static u32 lz77Compress(u8 *uncompressed_text, u32 uncompressed_size, u8 *compressed_text, u8 pointer_length_width)
 {
     u16 pointer_pos, temp_pointer_pos, output_pointer, pointer_length, temp_pointer_length;
     u32 compressed_pointer, output_size, coding_pos, output_lookahead_ref, look_behind, look_ahead;
     u16 pointer_pos_max, pointer_length_max;
-    pointer_pos_max = x_to_the_n(2, 16 - pointer_length_width);
-    pointer_length_max = x_to_the_n(2, pointer_length_width);
+    pointer_pos_max = pow_n(2, 16 - pointer_length_width);
+    pointer_length_max = pow_n(2, pointer_length_width);
 
     *((u32 *)compressed_text) = uncompressed_size;
     *(compressed_text + 4) = pointer_length_width;
@@ -6709,7 +6706,7 @@ static u32 lz77_compress(u8 *uncompressed_text, u32 uncompressed_size, u8 *compr
     return output_size;
 }
 
-static u32 lz77_decompress(u8 *compressed_text, u8 *uncompressed_text)
+static u32 lz77Decompress(u8 *compressed_text, u8 *uncompressed_text)
 {
     u8 pointer_length_width;
     u16 input_pointer, pointer_length, pointer_pos, pointer_length_mask;
@@ -6719,7 +6716,7 @@ static u32 lz77_decompress(u8 *compressed_text, u8 *uncompressed_text)
     pointer_length_width = *(compressed_text + 4);
     compressed_pointer = 5;
 
-    pointer_length_mask = x_to_the_n(2, pointer_length_width) - 1;
+    pointer_length_mask = pow_n(2, pointer_length_width) - 1;
 
     for (coding_pos = 0; coding_pos < uncompressed_size; ++coding_pos)
     {
@@ -6737,14 +6734,14 @@ static u32 lz77_decompress(u8 *compressed_text, u8 *uncompressed_text)
 }
 
 // adapted from decomp github.com/doldecomp/melee/blob/7f0e2ddb83fa974b64b05d0a7e5b374cf12c0541/src/melee/ft/ftwalljump.c
-static bool can_walljump(GOBJ* fighter) {
+static bool CanWalljump(GOBJ* fighter) {
     FighterData *fighter_data = fighter->userdata;
     CollData* coll_data = &fighter_data->coll_data;
 
     return fighter_data->flags.can_walljump && (coll_data->envFlags & ((1u << 11) | (1u << 5))) != 0;
 }
 
-static bool check_has_jump(GOBJ *g) {
+static bool CheckHasJump(GOBJ *g) {
     FighterData *data = g->userdata;
     int max_jumps = data->attr.max_jumps;
     int jumps_used = data->jump.jumps_used;

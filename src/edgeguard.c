@@ -225,11 +225,11 @@ static bool enabled(int opt_idx) {
     return Options_Main[opt_idx].val;
 }
 
-static int in_hitstun_anim(int state) {
+static int InHitstunAnim(int state) {
     return ASID_DAMAGEHI1 <= state && state <= ASID_DAMAGEFLYROLL;
 }
 
-static int hitstun_ended(GOBJ *fighter) {
+static int HitstunEnded(GOBJ *fighter) {
     FighterData *data = fighter->userdata;
     float hitstun = *((float*)&data->state_var.state_var1);
     return hitstun == 0.0;
@@ -244,7 +244,7 @@ static bool air_actionable(GOBJ *fighter) {
 
     int state = data->state_id;
 
-    if (in_hitstun_anim(state) && hitstun_ended(fighter))
+    if (InHitstunAnim(state) && HitstunEnded(fighter))
         return true;
 
     return (ASID_JUMPF <= state && state <= ASID_FALLAERIALB)
