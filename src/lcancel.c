@@ -210,24 +210,24 @@ void LCancel_Think(LCancelData *event_data, FighterData *hmn_data)
             event_data->fastfall_frame++; // increment frames
     }
 
-    if (is_aerial_landing_state(hmn_data->state_id) && hmn_data->state.frame == 0) {
+    if (IsAerialLandingState(hmn_data->state_id) && hmn_data->state.frame == 0) {
         // Record L input timing on the first frame of aerial landing
         event_data->current_l_input_timing = hmn_data->input.timer_trigger_any_ignore_hitlag;
     }
 
     bool has_horizontal_velocity = hmn_data->phys.self_vel.X != 0;
     bool is_success_l_input = event_data->current_l_input_timing < 7;
-    bool was_previous_state_aerial_landing = is_aerial_landing_state(hmn_data->TM.state_prev[0]);
+    bool was_previous_state_aerial_landing = IsAerialLandingState(hmn_data->TM.state_prev[0]);
 
-    bool is_success_l_cancel = is_aerial_landing_state(hmn_data->state_id) && is_success_l_input;
+    bool is_success_l_cancel = IsAerialLandingState(hmn_data->state_id) && is_success_l_input;
 
-    bool is_missed_l_cancel = is_aerial_landing_state(hmn_data->state_id)
+    bool is_missed_l_cancel = IsAerialLandingState(hmn_data->state_id)
         && !is_success_l_input
         // If there's no horizontal velocity then it's not possible to edge cancel and a miss is confirmed
         // OR if the number of landing frames has exceeded the number of frames of the l-cancelled animation then it's considered a miss (even if an edge cancel can still occur)
         && (!has_horizontal_velocity || ((hmn_data->state.frame + 1) > (hmn_data->figatree_curr->frame_num / 2)));
 
-    bool is_edge_cancel = is_edge_cancel_state(hmn_data->state_id)
+    bool is_edge_cancel = IsEdgeCancelState(hmn_data->state_id)
         && was_previous_state_aerial_landing;
 
     if (!event_data->is_current_aerial_counted && (is_success_l_cancel || is_missed_l_cancel || is_edge_cancel))
@@ -287,12 +287,12 @@ void LCancel_Think(LCancelData *event_data, FighterData *hmn_data)
         JOBJ_AddAnimAll(hud_jobj, 0, event_data->lcancel_assets->hudmatanim[is_fail], 0);
         JOBJ_ReqAnimAll(hud_jobj, 0);
     } 
-    else if (!is_aerial_landing_state(hmn_data->state_id) && !is_edge_cancel_state(hmn_data->state_id))
+    else if (!IsAerialLandingState(hmn_data->state_id) && !IsEdgeCancelState(hmn_data->state_id))
     {
         event_data->is_current_aerial_counted = false;
     }
 
-    if (is_auto_cancel_landing(hmn_data))
+    if (IsAutoCancelLanding(hmn_data))
     {
         // state as autocancelled
         Text_SetText(event_data->hud.text_time, 0, "Auto-canceled");
@@ -330,7 +330,7 @@ void LCancel_Think(LCancelData *event_data, FighterData *hmn_data)
             Text_SetText(event_data->hud.text_air, 0, "-");
     }
 
-    if (!can_fastfall && !is_aerial_landing_state(state)) // cant fastfall, reset frames
+    if (!can_fastfall && !IsAerialLandingState(state)) // cant fastfall, reset frames
     {
         event_data->fastfall_frame = 0;
         event_data->is_fastfall = false;
@@ -452,7 +452,7 @@ void Tips_Think(LCancelData *event_data, FighterData *hmn_data)
             }
 
             // update tip conditions
-            if (is_aerial_landing_state(hmn_data->state_id) && (hmn_data->TM.state_frame == 0) && // is in aerial landing
+            if (IsAerialLandingState(hmn_data->state_id) && (hmn_data->TM.state_frame == 0) && // is in aerial landing
                 ((event_data->current_l_input_timing >= 7) && (event_data->current_l_input_timing <= 15)) &&      // was early for an l-cancel
                 (event_data->tip.fastfall_active == 0))                                           // succeeded the last aerial landing
             {
@@ -778,23 +778,19 @@ int Barrel_OnDestroy(GOBJ *barrel_gobj)
     return 0;
 }
 
-bool is_aerial_landing_state(int state_id) {
-    return (state_id >= ASID_LANDINGAIRN) && (state_id <= ASID_LANDINGAIRLW);
+bool IsAerialLandingState(int state_id) {
+    return ASID_LANDINGAIRN <= state_id && state_id <= ASID_LANDINGAIRLW;
 }
 
-bool is_edge_cancel_state(int state_id) {
-    return (state_id == ASID_FALL || state_id == ASID_OTTOTTO);
+bool IsEdgeCancelState(int state_id) {
+    return state_id == ASID_FALL || state_id == ASID_OTTOTTO;
 }
 
-bool is_auto_cancel_landing(FighterData *hmn_data) {
+bool IsAutoCancelLanding(FighterData *hmn_data) {
     return hmn_data->state_id == ASID_LANDING
         && hmn_data->TM.state_frame == 0                   // if first frame of landing
         && hmn_data->TM.state_prev[0] >= ASID_ATTACKAIRN
         && hmn_data->TM.state_prev[0] <= ASID_ATTACKAIRLW; // came from aerial attack
-}
-
-int min(int a, int b) {
-    return a < b ? a : b;
 }
 
 static void *item_callbacks[] = {
