@@ -9,7 +9,7 @@ void ChangeFireSpeedOption(GOBJ *event_menu, int value);
 void ChangeDirection(GOBJ *event_menu, int value);
 void ChangeRandomFireDelayMin(GOBJ *event_menu, int value);
 void ChangeRandomFireDelayMax(GOBJ *event_menu, int value);
-int get_random_laser_delay();
+int GetRandomLaserDelay(void);
 
 enum menu_options {
     OPT_FIRE_SPEED,
@@ -150,7 +150,7 @@ void Event_Think(GOBJ *menu) {
         int delay_option = Options_Main[OPT_FIRE_SPEED].val;
 
         if (delay_option == FIRE_SPEED_RANDOM)
-            falco_wait_delay = get_random_laser_delay();
+            falco_wait_delay = GetRandomLaserDelay();
         else if (delay_option == FIRE_SPEED_SLOW)
             falco_wait_delay = 20;
         else if (delay_option == FIRE_SPEED_MEDIUM)
@@ -247,7 +247,7 @@ void ChangeRandomFireDelayMax(GOBJ *event_menu, int value) {
     }
 }
 
-int get_random_laser_delay() {
+int GetRandomLaserDelay(void) {
     int random_fire_delay_min = Options_Main[OPT_FIRE_DELAY_RANDOM_MIN].val;
     int random_fire_delay_max = Options_Main[OPT_FIRE_DELAY_RANDOM_MAX].val;
 
