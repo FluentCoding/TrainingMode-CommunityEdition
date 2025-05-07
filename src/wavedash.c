@@ -40,7 +40,7 @@ static EventOption WdOptions_Main[] = {
         .kind = OPTKIND_FUNC,
         .name = "Exit",
         .desc = "Return to the Event Selection Screen.",
-        .onOptionSelect = Event_Exit,
+        .OnSelect = Event_Exit,
     },
 };
 static EventMenu WdMenu_Main = {

@@ -153,7 +153,7 @@ static EventOption Options_Main[] = {
         .kind = OPTKIND_FUNC,
         .name = "Exit",
         .desc = "Return to the Event Select Screen.",
-        .onOptionSelect = Exit,
+        .OnSelect = Exit,
     },
 };
 static EventMenu Menu_Main = {

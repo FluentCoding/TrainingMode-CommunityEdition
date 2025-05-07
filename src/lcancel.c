@@ -14,7 +14,7 @@ static EventOption LcOptions_Main[] = {
         .name = "Target",                                                  // pointer to a string
         .desc = "Enable a target to attack. Use DPad down to\nmanually move it.", // string describing what this option does
         .values = LcOptions_Barrel,                                        // pointer to an array of strings
-        .onOptionChange = 0,
+        .OnChange = 0,
     },
     // HUD
     {
@@ -25,7 +25,7 @@ static EventOption LcOptions_Main[] = {
         .name = "HUD",                    // pointer to a string
         .desc = "Toggle visibility of the HUD.", // string describing what this option does
         .values = LcOptions_HUD,          // pointer to an array of strings
-        .onOptionChange = 0,
+        .OnChange = 0,
     },
     // Tips
     {
@@ -36,7 +36,7 @@ static EventOption LcOptions_Main[] = {
         .name = "Tips",                          // pointer to a string
         .desc = "Toggle the onscreen display of tips.", // string describing what this option does
         .values = LcOptions_HUD,                 // pointer to an array of strings
-        .onOptionChange = Tips_Toggle,
+        .OnChange = Tips_Toggle,
     },
     // Help
     {
@@ -47,7 +47,7 @@ static EventOption LcOptions_Main[] = {
         .name = "Help",                                                                                                                                                                                             // pointer to a string
         .desc = "L-canceling is performed by pressing L, R, or Z up to \n7 frames before landing from a non-special aerial\nattack. This will cut the landing lag in half, allowing \nyou to act sooner after attacking.", // string describing what this option does
         .values = 0,                                                                                                                                                                                                // pointer to an array of strings
-        .onOptionChange = 0,
+        .OnChange = 0,
     },
     // Exit
     {
@@ -58,8 +58,8 @@ static EventOption LcOptions_Main[] = {
         .name = "Exit",                           // pointer to a string
         .desc = "Return to the Event Selection Screen.", // string describing what this option does
         .values = 0,                              // pointer to an array of strings
-        .onOptionChange = 0,
-        .onOptionSelect = Event_Exit,
+        .OnChange = 0,
+        .OnSelect = Event_Exit,
     },
 };
 static EventMenu LabMenu_Main = {

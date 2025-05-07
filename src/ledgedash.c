@@ -72,7 +72,7 @@ static EventOption LdshOptions_Main[] = {
         .name = "Starting Position",
         .desc = "Choose where the fighter is placed \nafter resetting positions.",
         .values = LdshOptions_Start,
-        .onOptionChange = Ledgedash_ToggleStartPosition,
+        .OnChange = Ledgedash_ToggleStartPosition,
     },
     {
         .kind = OPTKIND_STRING,
@@ -95,7 +95,7 @@ static EventOption LdshOptions_Main[] = {
         .name = "Tips",
         .desc = "Toggle the onscreen display of tips.",
         .values = LdshOptions_HUD,
-        .onOptionChange = Tips_Toggle,
+        .OnChange = Tips_Toggle,
     },
     {
         .kind = OPTKIND_STRING,
@@ -103,7 +103,7 @@ static EventOption LdshOptions_Main[] = {
         .name = "Camera Mode",
         .desc = "Adjust the camera's behavior.\nIn advanced mode, use C-Stick while holding\nA/B/Y to pan, rotate and zoom, respectively.",
         .values = LdshOptions_CamMode,
-        .onOptionChange = Ledgedash_ChangeCamMode,
+        .OnChange = Ledgedash_ChangeCamMode,
     },
     {
         .kind = OPTKIND_STRING,
@@ -143,7 +143,7 @@ static EventOption LdshOptions_Main[] = {
         .kind = OPTKIND_FUNC,
         .name = "Exit",
         .desc = "Return to the Event Selection Screen.",
-        .onOptionSelect = Event_Exit,
+        .OnSelect = Event_Exit,
     },
 };
 

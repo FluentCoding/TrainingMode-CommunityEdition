@@ -50,7 +50,7 @@ static EventOption Options_Main[] = {
         .name = "Fire Speed",
         .desc = "Change the rate of fire.",
         .values = Options_FireSpeed,
-        .onOptionChange = ChangeFireSpeedOption,
+        .OnChange = ChangeFireSpeedOption,
     },
     {
         .kind = OPTKIND_INT,
@@ -59,7 +59,7 @@ static EventOption Options_Main[] = {
         .name = "Min Fire Delay",
         .desc = "Adjust the minimum number of frames between lasers",
         .values = "%d",
-        .onOptionChange = ChangeRandomFireDelayMin,
+        .OnChange = ChangeRandomFireDelayMin,
         .disable = false,
     },
     {
@@ -69,7 +69,7 @@ static EventOption Options_Main[] = {
         .name = "Max Fire Delay",
         .desc = "Adjust the maximum number of frames between lasers",
         .values = "%d",
-        .onOptionChange = ChangeRandomFireDelayMax,
+        .OnChange = ChangeRandomFireDelayMax,
         .disable = false,
     },
     {
@@ -85,13 +85,13 @@ static EventOption Options_Main[] = {
         .name = "Direction",
         .desc = "Change which way falco shoots a laser.",
         .values = Options_Direction,
-        .onOptionChange = ChangeDirection,
+        .OnChange = ChangeDirection,
     },
     {
         .kind = OPTKIND_FUNC,
         .name = "Exit",
         .desc = "Return to the Event Select Screen.",
-        .onOptionSelect = Exit,
+        .OnSelect = Exit,
     },
 };
 

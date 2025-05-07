@@ -3137,8 +3137,8 @@ void EventMenu_Update(GOBJ *gobj)
                         if (shortcut->option != 0) {
                             EventOption *option = shortcut->option;
                             option->val = (option->val + 1) % option->value_num;
-                            if (option->onOptionChange)
-                                option->onOptionChange(stc_event_vars.menu_gobj, option->val);
+                            if (option->OnChange)
+                                option->OnChange(stc_event_vars.menu_gobj, option->val);
                             SFX_PlayCommon(2);
                         }
 
@@ -3326,8 +3326,8 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
                 currOption->val = val;
 
                 // run on change function if it exists
-                if (currOption->onOptionChange != 0)
-                    currOption->onOptionChange(gobj, currOption->val);
+                if (currOption->OnChange != 0)
+                    currOption->OnChange(gobj, currOption->val);
             }
         }
     }
@@ -3349,8 +3349,8 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
                 currOption->val = val;
 
                 // run on change function if it exists
-                if (currOption->onOptionChange != 0)
-                    currOption->onOptionChange(gobj, currOption->val);
+                if (currOption->OnChange != 0)
+                    currOption->OnChange(gobj, currOption->val);
             }
         }
     }
@@ -3420,10 +3420,10 @@ void EventMenu_MenuThink(GOBJ *gobj, EventMenu *currMenu) {
         */
 
         // check to run a function
-        if (currOption->kind == OPTKIND_FUNC && currOption->onOptionSelect != 0)
+        if (currOption->kind == OPTKIND_FUNC && currOption->OnSelect != 0)
         {
             // execute function
-            currOption->onOptionSelect(gobj);
+            currOption->OnSelect(gobj);
 
             // update text
             EventMenu_UpdateText(gobj, currMenu);
@@ -3605,8 +3605,8 @@ void EventMenu_PopupThink(GOBJ *gobj, EventMenu *currMenu)
         currOption->val = cursor + scroll;
 
         // run on change function if it exists
-        if (currOption->onOptionChange != 0)
-            currOption->onOptionChange(gobj, currOption->val);
+        if (currOption->OnChange != 0)
+            currOption->OnChange(gobj, currOption->val);
 
         EventMenu_DestroyPopup(gobj);
 

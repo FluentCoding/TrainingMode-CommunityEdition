@@ -154,7 +154,7 @@ void Lab_AddCustomOSD(GOBJ *menu_gobj) {
         .kind = OPTKIND_FUNC,
         .name = row_text,
         .desc = "Remove this Custom OSD.",
-        .onOptionSelect = Lab_RemoveCustomOSD,
+        .OnSelect = Lab_RemoveCustomOSD,
     };
 }
 
@@ -5892,8 +5892,8 @@ void Event_Init(GOBJ *gobj)
     // info display
     memcpy(LabOptions_InfoDisplayHMN, LabOptions_InfoDisplayDefault, sizeof(LabOptions_InfoDisplayDefault));
     memcpy(LabOptions_InfoDisplayCPU, LabOptions_InfoDisplayDefault, sizeof(LabOptions_InfoDisplayDefault));
-    LabOptions_InfoDisplayHMN[OPTINF_PRESET].onOptionChange = Lab_ChangeInfoPresetHMN;
-    LabOptions_InfoDisplayCPU[OPTINF_PRESET].onOptionChange = Lab_ChangeInfoPresetCPU;
+    LabOptions_InfoDisplayHMN[OPTINF_PRESET].OnChange = Lab_ChangeInfoPresetHMN;
+    LabOptions_InfoDisplayCPU[OPTINF_PRESET].OnChange = Lab_ChangeInfoPresetCPU;
 
     // saved options
     Memcard *memcard = R13_PTR(MEMCARD);
@@ -6457,7 +6457,7 @@ void Event_Think(GOBJ *event)
         }
     }
 
-    if (LabOptions_CPU[OPTCPU_SET_POS].onOptionSelect == Lab_FinishMoveCPU) {
+    if (LabOptions_CPU[OPTCPU_SET_POS].OnSelect == Lab_FinishMoveCPU) {
         // set CPU position
 
         if (cpu_data->phys.air_state == 0) // if is grounded
