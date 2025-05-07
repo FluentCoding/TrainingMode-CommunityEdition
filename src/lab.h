@@ -3068,6 +3068,6 @@ static Shortcut Lab_Shortcuts[] = {
 };
 
 static ShortcutList Lab_ShortcutList = {
-    .count = ARRAY_LEN(Lab_Shortcuts),
+    .count = countof(Lab_Shortcuts),
     .list = Lab_Shortcuts,
 };

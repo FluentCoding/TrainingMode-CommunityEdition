@@ -7,11 +7,9 @@
 #define TM_FUNC -(50 * 4)
 #define MENU_MAXOPTION 9
 #define MENU_POPMAXOPTION 5
-#define countof(A) sizeof(A)/sizeof(*A)
+#define countof(A) (sizeof(A)/sizeof(*A))
 
 #define TMLOG(...) DevelopText_AddString(event_vars->db_console_text, __VA_ARGS__)
-
-#define ARRAY_LEN(arr) (sizeof(arr) / sizeof(*arr))
 
 // disable all logs in release mode
 #if TM_DEBUG == 0
@@ -414,17 +412,21 @@ static EventVars **event_vars_ptr = 0x803d7054; //R13 + (-0x4730)
 static EventVars *event_vars;
 
 // EventOption kind definitions
-#define OPTKIND_MENU 0
-#define OPTKIND_STRING 1
-#define OPTKIND_INT 2
-#define OPTKIND_FLOAT 3
-#define OPTKIND_FUNC 4
+enum option_kind {
+    OPTKIND_MENU,
+    OPTKIND_STRING,
+    OPTKIND_INT,
+    OPTKIND_FLOAT,
+    OPTKIND_FUNC,
+};
 
 // EventMenu state definitions
-#define EMSTATE_FOCUS 0
-#define EMSTATE_OPENSUB 1
-#define EMSTATE_OPENPOP 2
-#define EMSTATE_WAIT 3 // pauses menu logic, used for when a custom window is being shown
+enum event_menu_state {
+    EMSTATE_FOCUS,
+    EMSTATE_OPENSUB,
+    EMSTATE_OPENPOP,
+    EMSTATE_WAIT, // pauses menu logic, used for when a custom window is being shown
+};
 
 // GX Link args
 #define GXLINK_MENUMODEL 12

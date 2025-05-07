@@ -5923,8 +5923,8 @@ void Event_Init(GOBJ *gobj)
         if (save_hmn.overlay != 0) {
             // ensure valid
             if (
-                save_hmn.group < ARRAY_LEN(LabOptions_OverlaysHMN)
-                && save_hmn.overlay < ARRAY_LEN(LabValues_OverlayColours)
+                save_hmn.group < countof(LabOptions_OverlaysHMN)
+                && save_hmn.overlay < countof(LabValues_OverlayColours)
             ) {
                 LabOptions_OverlaysHMN[save_hmn.group].val = save_hmn.overlay;
             } else {
@@ -5936,8 +5936,8 @@ void Event_Init(GOBJ *gobj)
         if (save_cpu.overlay != 0) {
             // ensure valid
             if (
-                save_cpu.group < ARRAY_LEN(LabOptions_OverlaysCPU)
-                && save_cpu.overlay < ARRAY_LEN(LabValues_OverlayColours)
+                save_cpu.group < countof(LabOptions_OverlaysCPU)
+                && save_cpu.overlay < countof(LabValues_OverlayColours)
             ) {
                 LabOptions_OverlaysCPU[save_cpu.group].val = save_cpu.overlay;
             } else {

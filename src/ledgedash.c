@@ -164,7 +164,7 @@ static Shortcut Ldsh_Shortcuts[] = {
 };
 
 static ShortcutList Ldsh_ShortcutList = {
-    .count = ARRAY_LEN(Ldsh_Shortcuts),
+    .count = countof(Ldsh_Shortcuts),
     .list = Ldsh_Shortcuts,
 };
 
@@ -1434,7 +1434,7 @@ int Update_CheckAdvance(void)
     static int stc_advance_btns[] = {HSD_TRIGGER_L, HSD_TRIGGER_Z, HSD_BUTTON_X, HSD_BUTTON_Y, HSD_TRIGGER_R};
     Memcard *memcard = R13_PTR(MEMCARD);
     int btn_idx = memcard->TM_LabFrameAdvanceButton;
-    if (btn_idx >= ARRAY_LEN(stc_advance_btns))
+    if (btn_idx >= countof(stc_advance_btns))
         btn_idx = 0;
     int advance_btn = stc_advance_btns[btn_idx];
 
