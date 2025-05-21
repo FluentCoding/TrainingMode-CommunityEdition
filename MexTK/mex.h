@@ -19,7 +19,6 @@
 #include "include/hsd.h"
 #include "include/inline.h"
 #include "include/item.h"
-#include "include/kirby.h"
 #include "include/math.h"
 #include "include/memcard.h"
 #include "include/mex.h"

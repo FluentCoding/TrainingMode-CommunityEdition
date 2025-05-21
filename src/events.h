@@ -1,4 +1,5 @@
 #include "../MexTK/mex.h"
+#include <stdint.h>
 
 #define TM_VERSSHORT "TM-CE v1.2 d5"
 #define TM_VERSLONG "TM Community Edition v1.2 d5"
@@ -72,17 +73,66 @@ typedef struct EventMatchData //r8
     unsigned int timerSeconds : 32;   // 0xFFFFFFFF
     unsigned int timerSubSeconds : 8; // 0xFF
 } EventMatchData;
+enum CSSID {
+    CSSID_DOCTOR_MARIO   = 1 << 0,
+    CSSID_MARIO          = 1 << 1,
+    CSSID_LUIGI          = 1 << 2,
+    CSSID_BOWSER         = 1 << 3,
+    CSSID_PEACH          = 1 << 4,
+    CSSID_YOSHI          = 1 << 5,
+    CSSID_DONKEY_KONG    = 1 << 6,
+    CSSID_CAPTAIN_FALCON = 1 << 7,
+    CSSID_GANONDORF      = 1 << 8,
+    CSSID_FALCO          = 1 << 9,
+    CSSID_FOX            = 1 << 10,
+    CSSID_NESS           = 1 << 11,
+    CSSID_ICE_CLIMBERS   = 1 << 12,
+    CSSID_KIRBY          = 1 << 13,
+    CSSID_SAMUS          = 1 << 14,
+    CSSID_ZELDA          = 1 << 15,
+    CSSID_LINK           = 1 << 16,
+    CSSID_YOUNG_LINK     = 1 << 17,
+    CSSID_PICHU          = 1 << 18,
+    CSSID_PIKACHU        = 1 << 19,
+    CSSID_JIGGLYPUFF     = 1 << 20,
+    CSSID_MEWTWO         = 1 << 21,
+    CSSID_GAME_AND_WATCH = 1 << 22,
+    CSSID_MARTH          = 1 << 23,
+    CSSID_ROY            = 1 << 24
+};
+// This order must match the EventJumpTable in Globals.s
+enum JumpTableIndex {
+    JUMP_AMSAHTECH,
+    JUMP_ATTACKONSHIELD,
+    JUMP_COMBO,
+    JUMP_EGGS,
+    JUMP_ESCAPESHIEK,
+    JUMP_GRABMASH,
+    JUMP_LEDGESTALL,
+    JUMP_LEDGETECH,
+    JUMP_LEDGETECHCOUNTER,
+    JUMP_MULTISHINE,
+    JUMP_REACTION,
+    JUMP_REVERSAL,
+    JUMP_SDITRAINING,
+    JUMP_SHIELDDROP,
+    JUMP_SIDEBSWEET,
+    JUMP_SLIDEOFF,
+    JUMP_WAVESHINESDI
+};
 typedef struct EventDesc
 {
     char *eventName;
     char *eventDescription;
     char *eventFile;
+    int jumpTableIndex;
     char *eventCSSFile;
     u8 isSelectStage : 1;
     u8 use_savestates : 1;  // enables dpad left and right savestates
     u8 disable_hazards : 1; // removes stage hazards
     u8 force_sopo : 1;
     u8 CSSType;
+    int CSSList;
     u8 scoreType;
     u8 callbackPriority;
     EventMatchData *matchData;

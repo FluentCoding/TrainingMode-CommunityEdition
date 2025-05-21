@@ -545,12 +545,12 @@ GOBJ *Target_Spawn(WavedashData *event_data, FighterData *hmn_data)
     int min_exists = 0;
     min_exists += Target_CheckArea(event_data, hmn_data->coll_data.ground_index, &hmn_data->phys.pos, max, 0, 0, 0);
     min_exists += Target_CheckArea(event_data, hmn_data->coll_data.ground_index, &hmn_data->phys.pos, max * -1, 0, 0, 0);
-    if (min_exists != 0)
+    if (!min_exists)
     {
 
         // begin looking for valid ground at a random distance
         int is_ground = 0;
-        while (is_ground != 1)
+        while (!is_ground)
         {
 
             // select random direction

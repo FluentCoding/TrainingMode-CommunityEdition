@@ -16,7 +16,6 @@
 80022C30:atan2
 8002702C:Audio_QueueFileLoad
 80026F2C:Audio_ResetCache
-800056A8:Audio_RequestSSMLoad
 80027648:Audio_SyncLoadAll
 80027168:Audio_UpdateCache
 802886C4:Barrel_EnterBreak
@@ -718,10 +717,6 @@
 8016895C:JOBJ_AddSetAnim
 8000B804:JOBJ_ResetFromDesc
 8036F4C8:JOBJ_RemoveAnimByFlags
-802F2810:AS_CaptureWaitKirbyItem
-800BD620:AS_CaptureWaitKirby
-800F190C:Kirby_ResetCopyCharVars
-800EEEC4:Kirby_ExecuteAbilityLossFunction
 802FA5BC:KOCount_Init
 802FA2D0:KOCount_Update
 803672DC:LObj_LoadDesc
@@ -811,13 +806,6 @@
 80003100:memset
 803D7080:MEX_LoadRelArchive
 803D7074:MEX_RelocRelArchive
-803D7094:MEX_GetData
-803D7088:MEX_GetFtItemID
-803D708C:MEX_GetGrItemID
-803D7084:MEX_GetKirbyCpData
-803D707C:MEX_GetPlaylist
-803D7058:MEX_IndexFighterItem
-800056A0:MEX_GetSSMID
 80363C2C:MOBJ_SetAlpha
 80363B8C:MOBJ_SetToonTextureImage
 80362E98:MOBJ_ReqAnim
@@ -926,7 +914,6 @@
 80024030:SFX_PlayCommon
 8002411C:SFX_PlayCrowd
 8038CFF4:SFX_PlayRaw
-803D7078:SFX_PlayStageSFX
 80088A50:SFX_StopAllFighterSFX
 80321CE8:SFX_StopCrowd
 800237A8:SFX_PlayFullVolume
@@ -939,7 +926,6 @@
 80364340:fmod
 803263D4:sin
 803265A8:log
-803D7060:Mex_GetStockIconFrame
 80323CF4:sprintf
 8000D5BC:sqrtf
 801A5754:SSS_InitMinorData

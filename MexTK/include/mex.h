@@ -276,24 +276,13 @@ static MEXFunctionLookup **stc_mexfunction_lookup = 0x804dfad8;
 
 /*** Functions ***/
 HSD_Archive *MEX_LoadRelArchive(char *file, void *functions, char *symbol);
-void MEX_IndexFighterItem(int fighter_kind, ItemDesc *itemdesc, int item_id);
-// void SpawnMEXEffect(int effectID, int fighter, int arg1, int arg2, int arg3, int arg4, int arg5);
-float Mex_GetStockIconFrame(int internal_id, int costume_id);
-int MEX_GetFtItemID(GOBJ *f, int item_id);
-int MEX_GetGrItemID(int item_id);
-int MEX_GetSSMID(SSMKind ssm_kind, int kind); // ssm_kind, 0 = fighter, 1 = stage | kind is the c_kind / gr_kind
 void MEX_RelocRelArchive(void *xFunction);
-int SFX_PlayStageSFX(int sfx_id); // use index relative to the ssm (start at 0)
 void *calloc(int size);
 void bp();
 
 // see https://smashboards.com/threads/primitive-drawing-module.454232/
 PRIM *PRIM_NEW(int vert_count, int params1, int params2);
 void PRIM_CLOSE();
-
-MEXPlaylist *MEX_GetPlaylist();
-void *MEX_GetKirbyCpData(int copy_id);
-void *MEX_GetData(int index);
 
 static void MEX_InitRELDAT(HSD_Archive *archive, char *symbol_name, int *return_func_array)
 {
@@ -308,46 +297,6 @@ static void MEX_InitRELDAT(HSD_Archive *archive, char *symbol_name, int *return_
         MEXFunctionTable *this_func = &mex_function->func_reloc_table[i];
         return_func_array[i] = &mex_function->code[this_func->code_offset];
     }
-}
-/// @brief
-/// @param stc_icns
-/// @param c_kind
-/// @param costume_id
-/// @return
-static float MEX_GetStockIconFrame(Stc_icns *stc_icns, int c_kind, int costume_id)
-{
-    FtKindDesc *ftkind_desc = MEX_GetData(MXDT_FTKINDDESC);
-    int ft_kind = ftkind_desc[c_kind].ft_main;
-
-    int ftkind_num = MEX_GetData(MXDT_FTINTNUM);
-    float stock_frame;
-
-    // check for special fighter
-    if (ft_kind >= (ftkind_num - (33 - FTKIND_MASTERHAND)) &&
-        ft_kind <= (ftkind_num - (33 - FTKIND_SANDBAG)))
-    {
-        static u8 special_ft_stock[] = {3, 2, 1, 1, 5, 6};
-        stock_frame = special_ft_stock[ft_kind];
-    }
-    else
-        stock_frame = stc_icns->reserved_num + (costume_id * stc_icns->stride) + ft_kind;
-
-    return stock_frame;
-}
-/// @brief
-/// @param sfxid
-/// @param volume
-/// @param panning
-/// @return
-static int MEX_PlayStageSoundRaw(int sfxid, int volume, int panning)
-{
-    // get soundbank id
-    MexData *md = MEX_GetData(MXDT_MEXDATA);
-    int internal_id = Stage_ExternalToInternal(Stage_GetExternalID());
-    int bank = md->stage->sound_table[internal_id].ssmid * 10000;
-
-    // play sound
-    return SFX_PlayRaw(bank + sfxid, volume, panning, 0, 6);
 }
 
 #endif

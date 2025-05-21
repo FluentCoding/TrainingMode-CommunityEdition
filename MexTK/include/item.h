@@ -973,10 +973,6 @@ struct ItemData
         int xfc4;                                       // 0xfc4
         int xfc8;                                       // 0xfc8
     } item_var;                                         //
-    struct                                              //
-    {                                                   //
-        GOBJ *fighter_orig;                             // 0xfcc
-    } MEX;
 };
 
 /*** static reference ***/

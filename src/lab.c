@@ -3644,6 +3644,10 @@ void Record_CObjThink(GOBJ *gobj)
 }
 void Record_GX(GOBJ *gobj, int pass)
 {
+    bool hideHUD = *(u8*)(R13 + -0x4948);
+    rec_data.text->hidden = hideHUD;
+    if (hideHUD) return;
+    
     // update UI position
     // the reason im doing this here is because i want it to update in the menu
     if (pass == 0)
@@ -3655,8 +3659,11 @@ void Record_GX(GOBJ *gobj, int pass)
         int curr_frame = Record_GetCurrFrame();
         int end_frame = Record_GetEndFrame();
 
+        int cpu_mode = LabOptions_Record[OPTREC_CPUMODE].option_val;
+        int hmn_mode = LabOptions_Record[OPTREC_HMNMODE].option_val;
+        
         // hide seek bar during recording
-        if ((LabOptions_Record[OPTREC_CPUMODE].val == 2) || (LabOptions_Record[OPTREC_HMNMODE].val == 1))
+        if (hmn_mode == RECMODE_HMN_RECORD || cpu_mode == RECMODE_CPU_RECORD)
         {
             JOBJ_SetFlags(seek, JOBJ_HIDDEN);
 

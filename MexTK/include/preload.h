@@ -78,7 +78,7 @@ struct PreloadHeap //
     int is_disable;   // 0x18
 };
 
-struct PreloadHeapLookup //  is pointed to by OFST_HeapRuntime in m-ex. check Load MxDt.asm for this allocation
+struct PreloadHeapLookup
 {
     // these dont seem to change for the entirety of runtime
     // i guess they're referenced when rebuilding heaps between scenes
