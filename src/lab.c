@@ -3659,8 +3659,8 @@ void Record_GX(GOBJ *gobj, int pass)
         int curr_frame = Record_GetCurrFrame();
         int end_frame = Record_GetEndFrame();
 
-        int cpu_mode = LabOptions_Record[OPTREC_CPUMODE].option_val;
-        int hmn_mode = LabOptions_Record[OPTREC_HMNMODE].option_val;
+        int cpu_mode = LabOptions_Record[OPTREC_CPUMODE].val;
+        int hmn_mode = LabOptions_Record[OPTREC_HMNMODE].val;
         
         // hide seek bar during recording
         if (hmn_mode == RECMODE_HMN_RECORD || cpu_mode == RECMODE_CPU_RECORD)

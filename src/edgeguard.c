@@ -96,13 +96,13 @@ static void SimulatePhys(FighterData *data, int future, Vec2 *out) {
 
 static float ProjectedDistance(FighterData *a, FighterData *b, int future) {
     Vec2 a_future, b_future;
-    simulate_phys(a, future, &a_future);
-    simulate_phys(b, future, &b_future);
+    SimulatePhys(a, future, &a_future);
+    SimulatePhys(b, future, &b_future);
     return Vec2_Distance(&a_future, &b_future);
 }
 
 static bool Enabled(int opt_idx) {
-    return info->menu->options[opt_idx].option_val;
+    return info->menu->options[opt_idx].val;
 }
 
 static int InHitstunAnim(int state) {
@@ -143,7 +143,7 @@ static bool IsGroundActionable(GOBJ *fighter) {
 
     int state = data->state_id;
 
-    if (inHitstunAnim(data) && HitstunEnded(fighter))
+    if (InHitstunAnim(data) && HitstunEnded(fighter))
         return true;
 
     if (state == ASID_LANDING && data->state.frame >= data->attr.normal_landing_lag)
@@ -220,7 +220,7 @@ static void Reset(void) {
     Fighter_HitboxDisableAll(hmn);
     hmn_data->script.script_current = 0;
 
-    KBValues vals = HitStrength_KBRange[info->menu->options[OPT_HITSTRENGTH].option_val];
+    KBValues vals = HitStrength_KBRange[info->menu->options[OPT_HITSTRENGTH].val];
     
     float mag = vals.mag_min + (vals.mag_max - vals.mag_min) * HSD_Randf();
     
@@ -348,7 +348,7 @@ static void Think_Spacies(void) {
     Vec2 vel = { cpu_data->phys.self_vel.X, cpu_data->phys.self_vel.Y };
     int state = cpu_data->state_id;
     float dir = pos.X > 0.f ? -1.f : 1.f;
-    bool can_jump = cpu_data->jump.jumps_used < 2 && enabled(OPT_SPACIES_JUMP);
+    bool can_jump = cpu_data->jump.jumps_used < 2 && Enabled(OPT_SPACIES_JUMP);
     
     Vec2 target_ledge = ledge_positions[pos.X > 0.f];
     Vec2 target_ledgegrab = {
@@ -675,8 +675,7 @@ static void Think_Sheik(void) {
     } else if (state == 0x166) {
         // choose poof direction
         if (cpu_data->TM.state_frame == 34) {
-            // int ledge = enabled(OPT_SHEIK_UPB_LEDGE);
-            int ledge = false;
+            int ledge = Enabled(OPT_SHEIK_UPB_LEDGE);
             int stage_tip = Enabled(OPT_SHEIK_UPB_LEDGE);
             int above_ledge = Enabled(OPT_SHEIK_UPB_HIGH) && vec_to_ledgegrab.X < UPB_POOF_DISTANCE;
             int high = Enabled(OPT_SHEIK_UPB_HIGH);

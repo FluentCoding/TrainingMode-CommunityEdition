@@ -40,20 +40,20 @@ static KBValues HitStrength_KBRange[] = {
 };
 
 #define ExitOption {\
-    .option_kind = OPTKIND_FUNC,\
-    .option_name = "Exit",\
+    .kind = OPTKIND_FUNC,\
+    .name = "Exit",\
     .desc = "Return to the Event Select Screen.",\
-    .onOptionSelect = Exit,\
+    .OnSelect = Exit,\
 }
 
 // must be the first option
 #define HitStrengthOption {\
-    .option_kind = OPTKIND_STRING,\
-    .option_name = "Hit Strength",\
+    .kind = OPTKIND_STRING,\
+    .name = "Hit Strength",\
     .desc = "How far the CPU will be knocked back.",\
-    .option_values = Values_HitStrength,\
+    .values = Values_HitStrength,\
     .value_num = countof(Values_HitStrength),\
-    .option_val = 1,\
+    .val = 1,\
 }
 
 // Fox -------------------------------------------------
@@ -74,46 +74,46 @@ enum options_spacies {
 static EventOption Options_Main_Fox[] = {
     HitStrengthOption,
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Firefox Low",
+        .kind = OPTKIND_STRING,
+        .name = "Firefox Low",
         .desc = "Allow Fox to aim his up special to the ledge.",
-        .option_values = OffOn,
+        .values = OffOn,
         .value_num = 2,
-        .option_val = 1,
+        .val = 1,
     },
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Firefox Mid",
+        .kind = OPTKIND_STRING,
+        .name = "Firefox Mid",
         .desc = "Allow Fox to aim his up special to the stage.",
-        .option_values = OffOn,
+        .values = OffOn,
         .value_num = 2,
     },
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Firefox High",
+        .kind = OPTKIND_STRING,
+        .name = "Firefox High",
         .desc = "Allow Fox to aim his up special high.",
-        .option_values = OffOn,
+        .values = OffOn,
         .value_num = 2,
     },
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Double Jump",
+        .kind = OPTKIND_STRING,
+        .name = "Double Jump",
         .desc = "Allow Fox to double jump.",
-        .option_values = OffOn,
+        .values = OffOn,
         .value_num = 2,
     },
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Illusion",
+        .kind = OPTKIND_STRING,
+        .name = "Illusion",
         .desc = "Allow Fox to side special.",
-        .option_values = OffOn,
+        .values = OffOn,
         .value_num = 2,
     },
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Fast Fall",
+        .kind = OPTKIND_STRING,
+        .name = "Fast Fall",
         .desc = "Allow Fox to fast fall.",
-        .option_values = OffOn,
+        .values = OffOn,
         .value_num = 2,
     },
     ExitOption,
@@ -129,46 +129,46 @@ static EventMenu Menu_Main_Fox = {
 static EventOption Options_Main_Falco[] = {
     HitStrengthOption,
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Firebird Low",
+        .kind = OPTKIND_STRING,
+        .name = "Firebird Low",
         .desc = "Allow Falco to aim his up special to the ledge.",
-        .option_values = OffOn,
+        .values = OffOn,
         .value_num = 2,
-        .option_val = 1,
+        .val = 1,
     },
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Firebird Mid",
+        .kind = OPTKIND_STRING,
+        .name = "Firebird Mid",
         .desc = "Allow Falco to aim his up special to the stage.",
-        .option_values = OffOn,
+        .values = OffOn,
         .value_num = 2,
     },
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Firebird High",
+        .kind = OPTKIND_STRING,
+        .name = "Firebird High",
         .desc = "Allow Falco to aim his up special high.",
-        .option_values = OffOn,
+        .values = OffOn,
         .value_num = 2,
     },
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Double Jump",
+        .kind = OPTKIND_STRING,
+        .name = "Double Jump",
         .desc = "Allow Falco to double jump.",
-        .option_values = OffOn,
+        .values = OffOn,
         .value_num = 2,
     },
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Illusion",
+        .kind = OPTKIND_STRING,
+        .name = "Illusion",
         .desc = "Allow Falco to side special.",
-        .option_values = OffOn,
+        .values = OffOn,
         .value_num = 2,
     },
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Fast Fall",
+        .kind = OPTKIND_STRING,
+        .name = "Fast Fall",
         .desc = "Allow Falco to fast fall.",
-        .option_values = OffOn,
+        .values = OffOn,
         .value_num = 2,
     },
     ExitOption,
@@ -198,55 +198,55 @@ enum options_sheik {
 static EventOption Options_Main_Sheik[] = {
     HitStrengthOption,
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Vanish to Ledge",
-        .desc = "Allow Sheik to vanish to ledge and the tip of the stage.",
-        .option_values = OffOn,
+        .kind = OPTKIND_STRING,
+        .name = "Vanish to Ledge",
+        .desc = "Allow Sheik to vanish to ledge and the\ntip of the stage.",
+        .values = OffOn,
         .value_num = 2,
-        .option_val = 1,
+        .val = 1,
     },
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Vanish to Stage",
+        .kind = OPTKIND_STRING,
+        .name = "Vanish to Stage",
         .desc = "Allow Sheik to vanish deep into stage.",
-        .option_values = OffOn,
+        .values = OffOn,
         .value_num = 2,
-        .option_val = 1,
+        .val = 1,
     },
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Vanish High",
-        .desc = "Allow Sheik to vanish above the ledge and to platforms.",
-        .option_values = OffOn,
+        .kind = OPTKIND_STRING,
+        .name = "Vanish High",
+        .desc = "Allow Sheik to vanish above the ledge\nand to platforms.",
+        .values = OffOn,
         .value_num = 2,
-        .option_val = 1,
+        .val = 1,
     },
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Double Jump",
+        .kind = OPTKIND_STRING,
+        .name = "Double Jump",
         .desc = "Allow Sheik to double jump.",
-        .option_values = OffOn,
+        .values = OffOn,
         .value_num = 2,
     },
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Fast Fall",
+        .kind = OPTKIND_STRING,
+        .name = "Fast Fall",
         .desc = "Allow Sheik to fast fall.",
-        .option_values = OffOn,
+        .values = OffOn,
         .value_num = 2,
     },
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Fair",
+        .kind = OPTKIND_STRING,
+        .name = "Fair",
         .desc = "Allow Sheik to fair the player.",
-        .option_values = OffOn,
+        .values = OffOn,
         .value_num = 2,
     },
     {
-        .option_kind = OPTKIND_STRING,
-        .option_name = "Amsah Tech",
+        .kind = OPTKIND_STRING,
+        .name = "Amsah Tech",
         .desc = "Allow Sheik to Amsah Tech.",
-        .option_values = OffOn,
+        .values = OffOn,
         .value_num = 2,
     },
     ExitOption,
