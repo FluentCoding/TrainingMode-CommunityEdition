@@ -1,6 +1,6 @@
 # To be inserted at 802bd3ec
 
-.include "Fetch Setting.s"
+.include "Common.s"
 
 .set PEACH_REGULAR_TURNIP_MENUID, 0x1000
 .set PEACH_WINKY_TURNIP_MENUID, 0x2000
@@ -13,10 +13,10 @@
 .set PEACH_STITCH_FACE_TURNIP_RNG_VALUE, 57
 
 # r3 = RNG Return Value
-# r31 contains Fighter
-
+# r29 contains Fighter_GObj
 CharRng_FetchSetting r9, RandomTurnip
-lbz r10, 0xc(r31) # player_id
+lwz r10, 0x2c(r29) # userdata
+CharRng_LoadPlayerIdOfFighter r10, r10
 cmpwi r10, 0
 bne LoadCpuSetting
 

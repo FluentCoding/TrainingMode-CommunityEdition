@@ -1,12 +1,12 @@
 # To be inserted at 80142ae0
 
-.include "Fetch Setting.s"
+.include "Common.s"
 
 # r3 = output, 0 is misfire, 1 is no misfire
 # r31 contains Fighter
 
 CharRng_FetchSetting r6, RandomMisfire
-lbz r7, 0xc(r31) # player_id
+CharRng_LoadPlayerIdOfFighter r7, r31
 cmpwi r7, 0
 bne LoadCpuSetting
 

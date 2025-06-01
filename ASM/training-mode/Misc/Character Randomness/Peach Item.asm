@@ -1,6 +1,6 @@
 # To be inserted at 8011d0a4
 
-.include "Fetch Setting.s"
+.include "Common.s"
 
 .set PEACH_TURNIP_MENUID, 0x1000
 .set PEACH_MRSATURN_MENUID, 0x5000
@@ -16,7 +16,7 @@
 # r30 contains Fighter
 
 CharRng_FetchSetting r6, RandomItem
-lbz r7, 0xc(r30) # player_id
+CharRng_LoadPlayerIdOfFighter r7, r30
 cmpwi r7, 0
 bne LoadCpuSetting
 

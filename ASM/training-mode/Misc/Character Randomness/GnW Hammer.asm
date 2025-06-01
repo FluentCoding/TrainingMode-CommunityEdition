@@ -1,12 +1,12 @@
 # To be inserted at 8014c780
 
-.include "Fetch Setting.s"
+.include "Common.s"
 
 # r3 = 0-index number output
 # r31 contains Fighter
 
 CharRng_FetchSetting r6, SetHammer
-lbz r7, 0xc(r31) # player_id
+CharRng_LoadPlayerIdOfFighter r7, r31
 cmpwi r7, 0
 bne LoadCpuSetting
 

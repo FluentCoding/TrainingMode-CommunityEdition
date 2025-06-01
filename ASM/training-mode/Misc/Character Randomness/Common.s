@@ -19,3 +19,7 @@ rlwinm \reg, \reg, 4, 16, 19
 "'hmn' or 'rng' expected as second argument"
 .endif
 .endm
+
+.macro CharRng_LoadPlayerIdOfFighter reg, fighter_reg
+lbz \reg, 0xc(\fighter_reg)
+.endm
