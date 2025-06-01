@@ -9,6 +9,7 @@ static EventMenu LabMenu_OverlaysHMN;
 static EventMenu LabMenu_OverlaysCPU;
 static EventMenu LabMenu_InfoDisplayHMN;
 static EventMenu LabMenu_InfoDisplayCPU;
+static EventMenu LabMenu_CharacterRng;
 static EventMenu LabMenu_CPU;
 static EventMenu LabMenu_AdvCounter;
 static EventMenu LabMenu_Record;
@@ -807,6 +808,7 @@ enum lab_option
     OPTLAB_RECORD_OPTIONS,
     OPTLAB_INFODISP_HMN,
     OPTLAB_INFODISP_CPU,
+    OPTLAB_CHAR_RNG,
     OPTLAB_STAGE,
     OPTLAB_HELP,
     OPTLAB_EXIT,
@@ -847,6 +849,14 @@ static EventOption LabOptions_Main[OPTLAB_COUNT] = {
         .menu = &LabMenu_InfoDisplayCPU,
         .name = "CPU Info Display",
         .desc = "Display various game information onscreen.",
+    },
+    {
+        .kind = OPTKIND_MENU,
+        .menu = &LabMenu_CharacterRng,
+        .disable = 1,
+        //.disable is set in Event_Init depending on fighters
+        .name = "Character RNG Behavior",
+        .desc = "Change RNG behavior of Peach, Luigi, G&W and Icies.",
     },
     {
         .kind = OPTKIND_MENU,
@@ -1271,6 +1281,104 @@ static EventMenu LabMenu_InfoDisplayCPU = {
     .option_num = sizeof(LabOptions_InfoDisplayCPU) / sizeof(EventOption),
     .options = &LabOptions_InfoDisplayCPU,
     .shortcuts = &Lab_ShortcutList,
+};
+
+// CHARACTER RNG MENU --------------------------------------------------------
+
+enum character_rng_option
+{
+    OPTCHARRNG_HMN_BEHAVIOR,
+    OPTCHARRNG_CPU_BEHAVIOR,
+    OPTCHARRNG_COUNT,
+};
+
+typedef struct CharacterRngData
+{
+    char name_len;
+    char* name;
+    char values_len;
+    char** values;
+} CharacterRngData;
+
+static CharacterRngData LabValues_CharacterRngPeach = {
+    sizeof("Turnip Pull"), "Turnip Pull",
+    8, (char*[]){ "Default", "Regular Turnip", "Winky Turnip", "Dot Eyes Turnip", "Stitch Face Turnip", "Mr. Saturn", "Bob-omb", "Beam Sword" }
+};
+static CharacterRngData LabValues_CharacterRngLuigi = {
+    sizeof("Misfire"), "Misfire",
+    3, (char*[]){ "Default", "Always misfire", "Never misfire" }
+};
+static CharacterRngData LabValues_CharacterRngGAW = {
+    sizeof("G&W Hammer"), "G&W Hammer",
+    10, (char*[]){ "Default", "1", "2", "3", "4", "5", "6", "7", "8", "9" }
+};
+static CharacterRngData LabValues_CharacterRngIcies = {
+    sizeof("Nana Throw"), "Nana Throw",
+    5, (char*[]){ "Default", "Forward Throw", "Backward Throw", "Upthrow", "Downthrow" }
+};
+
+static EventOption LabOptions_CharacterRng[OPTCHARRNG_COUNT] = {
+    {
+        .kind = OPTKIND_MENU,
+        .disable = 1,
+        .name = "HMN",
+        .desc = "Sets HMN behavior.",
+        .OnChange = Lab_ChangeCharacterRng,
+        //.name, .values and .value_num are set in Event_Init depending on fighter
+    },
+    {
+        .kind = OPTKIND_MENU,
+        .disable = 1,
+        .name = "CPU",
+        .desc = "Sets CPU behavior.",
+        .OnChange = Lab_ChangeCharacterRng,
+        //.name, .values and .value_num are set in Event_Init depending on fighter
+    }
+};
+
+static EventMenu LabMenu_CharacterRng = {
+    .name = "Character RNG Behavior",
+    .option_num = sizeof(LabOptions_CharacterRng) / sizeof(EventOption),
+    .options = &LabOptions_CharacterRng,
+    .shortcuts = &Lab_ShortcutList,
+};
+
+// CHARACTER RNG VALUES TABLE --------------------------------------------------------
+
+static const CharacterRngData* character_rng_values[] = {
+    0,                              // FTKIND_MARIO
+    0,                              // FTKIND_FOX
+    0,                              // FTKIND_FALCON
+    0,                              // FTKIND_DK
+    0,                              // FTKIND_KIRBY
+    0,                              // FTKIND_BOWSER
+    0,                              // FTKIND_LINK
+    0,                              // FTKIND_SHEIK
+    0,                              // FTKIND_NESS
+    &LabValues_CharacterRngPeach,   // FTKIND_PEACH
+    &LabValues_CharacterRngIcies,   // FTKIND_POPO
+    &LabValues_CharacterRngIcies,   // FTKIND_NANA
+    0,                              // FTKIND_PIKACHU
+    0,                              // FTKIND_SAMUS
+    0,                              // FTKIND_YOSHI
+    0,                              // FTKIND_JIGGLYPUFF
+    0,                              // FTKIND_MEWTWO
+    &LabValues_CharacterRngLuigi,   // FTKIND_LUIGI
+    0,                              // FTKIND_MARTH
+    0,                              // FTKIND_ZELDA
+    0,                              // FTKIND_YOUNGLINK
+    0,                              // FTKIND_DRMARIO
+    0,                              // FTKIND_FALCO
+    0,                              // FTKIND_PICHU
+    &LabValues_CharacterRngGAW,     // FTKIND_GAW
+    0,                              // FTKIND_GANONDORF
+    0,                              // FTKIND_ROY
+    0,                              // FTKIND_MASTERHAND
+    0,                              // FTKIND_CRAZYHAND
+    0,                              // FTKIND_BOY
+    0,                              // FTKIND_GIRL
+    0,                              // FTKIND_GIGABOWSER
+    0,                              // FTKIND_SANDBAG
 };
 
 // STAGE MENUS -----------------------------------------------------------

@@ -224,6 +224,9 @@ typedef struct LabData
     GOBJ *rec_gobj;
     u8 hmn_controller;
     u8 cpu_controller;
+
+    u8 hmn_rng_setting: 4;
+    u8 cpu_rng_setting: 4;
 } LabData;
 typedef struct InfoDisplayData
 {
@@ -393,6 +396,7 @@ void Lab_FreezeCPU(GOBJ *menu_gobj);
 void Lab_ChangeTauntEnabled(GOBJ *menu_gobj, int value);
 void Lab_ChangePlayerPercent(GOBJ *menu_gobj, int value);
 void Lab_ChangePlayerLockPercent(GOBJ *menu_gobj, int value);
+void Lab_ChangeCharacterRng(GOBJ *menu_gobj, int value);
 void Lab_ChangeFrameAdvance(GOBJ *menu_gobj, int value);
 void Lab_ChangeFrameAdvanceButton(GOBJ *menu_gobj, int value);
 void Lab_ChangeCPUPercent(GOBJ *menu_gobj, int value);

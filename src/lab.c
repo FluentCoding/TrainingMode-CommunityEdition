@@ -285,6 +285,12 @@ void Lab_ChangePlayerLockPercent(GOBJ *menu_gobj, int value)
         hmn_locked_percent = fighter_data->dmg.percent;
 }
 
+void Lab_ChangeCharacterRng(GOBJ *menu_gobj, int value) {
+    LabData* event_data = event_vars->event_gobj->userdata;
+    event_data->hmn_rng_setting = LabOptions_CharacterRng[OPTCHARRNG_HMN_BEHAVIOR].val;
+    event_data->cpu_rng_setting = LabOptions_CharacterRng[OPTCHARRNG_CPU_BEHAVIOR].val;
+}
+
 void Lab_StartMoveCPU(GOBJ *menu_gobj) {
     LabOptions_CPU[OPTCPU_SET_POS] = LabOptions_CPU_FinishMoveCPU;
 
@@ -5953,6 +5959,46 @@ void Event_Init(GOBJ *gobj)
         int osd_bit_position = osd_memory_bit_position[i];
         int is_osd_enabled = (enabled_osds & (1 << osd_bit_position)) != 0;
         LabOptions_OSDs[i].val = is_osd_enabled;
+    }
+
+    // character rng options
+    {
+        CharacterRngData* hmn_rng_data = character_rng_values[hmn_data->kind];
+        CharacterRngData* cpu_rng_data = character_rng_values[cpu_data->kind];
+        if (hmn_rng_data != 0 || cpu_rng_data != 0) {
+            LabOptions_Main[OPTLAB_CHAR_RNG].disable = 0;
+            EventOption* behavior_opt;
+            if (hmn_rng_data != 0) {
+                behavior_opt = &LabOptions_CharacterRng[OPTCHARRNG_HMN_BEHAVIOR];
+
+                behavior_opt->disable = 0;
+                behavior_opt->kind = OPTKIND_STRING;
+
+                const char* name_prefix = "HMN ";
+                char* name_buf = HSD_MemAlloc(sizeof(name_prefix) + hmn_rng_data->name_len);
+                strcpy(name_buf, name_prefix);
+                strcat(name_buf, hmn_rng_data->name);
+                behavior_opt->name = name_buf;
+
+                behavior_opt->values = hmn_rng_data->values;
+                behavior_opt->value_num = hmn_rng_data->values_len;
+            }
+            if (cpu_rng_data != 0) {
+                behavior_opt = &LabOptions_CharacterRng[OPTCHARRNG_CPU_BEHAVIOR];
+
+                behavior_opt->disable = 0;
+                behavior_opt->kind = OPTKIND_STRING;
+                
+                const char* name_prefix = "CPU ";
+                char* name_buf = HSD_MemAlloc(sizeof(name_prefix) + cpu_rng_data->name_len);
+                strcpy(name_buf, name_prefix);
+                strcat(name_buf, cpu_rng_data->name);
+                behavior_opt->name = name_buf;
+
+                behavior_opt->values = cpu_rng_data->values;
+                behavior_opt->value_num = cpu_rng_data->values_len;
+            }
+        }
     }
 
     // stage options

@@ -915,7 +915,8 @@
     branchl r3, 0x8021b2d8
     .endm
 
-    .set R13_EventVars, -0x4A0C
+    .set EventVars_Ptr, 0x803d7054
+    .set EventVars_EventGobj, (2 * 4)
     .set EventVars_MessageDisplay, (8 * 4)
 
     # Message Display

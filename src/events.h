@@ -466,7 +466,7 @@ static EventDesc *static_eventInfo;
 static EventVars stc_event_vars;
 static int *eventDataBackup;
 
-static EventVars **event_vars_ptr = 0x803d7054; //R13 + (-0x4730)
+static EventVars **event_vars_ptr = 0x803d7054;
 static EventVars *event_vars;
 
 // EventOption kind definitions
