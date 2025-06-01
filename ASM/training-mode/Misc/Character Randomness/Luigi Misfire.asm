@@ -5,7 +5,6 @@
 # r3 = output, 0 is misfire, 1 is no misfire
 # r31 contains Fighter
 
-# TODO make macro for all randomness ASMs to easily retrieve and compare hmn/cpu rng setting
 CharRng_FetchSetting r6, RandomMisfire
 lbz r7, 0xc(r31) # player_id
 cmpwi r7, 0
@@ -13,12 +12,12 @@ bne LoadCpuSetting
 
 LoadHmnSetting:
   CharRng_ExtractSetting r6, hmn
-  b BranchSettingCheck
+  b SettingCheck
 
 LoadCpuSetting:
   CharRng_ExtractSetting r6, cpu
 
-BranchSettingCheck:
+SettingCheck:
   cmpwi r6, 0x1000
   blt+ RandomMisfire
   beq AlwaysMisfire
