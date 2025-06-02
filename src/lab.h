@@ -1301,7 +1301,7 @@ typedef struct CharacterRngData
 } CharacterRngData;
 
 static CharacterRngData LabValues_CharacterRngPeach = {
-    sizeof("Turnip Pull"), "Turnip Pull",
+    sizeof("DownB Pull"), "DownB Pull",
     8, (char*[]){ "Default", "Regular Turnip", "Winky Turnip", "Dot Eyes Turnip", "Stitch Face Turnip", "Mr. Saturn", "Bob-omb", "Beam Sword" }
 };
 static CharacterRngData LabValues_CharacterRngLuigi = {
@@ -1309,7 +1309,7 @@ static CharacterRngData LabValues_CharacterRngLuigi = {
     3, (char*[]){ "Default", "Always misfire", "Never misfire" }
 };
 static CharacterRngData LabValues_CharacterRngGAW = {
-    sizeof("G&W Hammer"), "G&W Hammer",
+    sizeof("GnW Hammer"), "GnW Hammer",
     10, (char*[]){ "Default", "1", "2", "3", "4", "5", "6", "7", "8", "9" }
 };
 static CharacterRngData LabValues_CharacterRngIcies = {
