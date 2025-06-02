@@ -15,7 +15,7 @@
 # r6 = ItemKind to be passed to it_802BD4AC
 # r30 contains Fighter
 
-CharRng_FetchSetting r6, RandomItem
+CharRng_FetchSetting r6, SetResult
 CharRng_LoadPlayerIdOfFighter r7, r30
 cmpwi r7, 0
 bne LoadCpuSetting

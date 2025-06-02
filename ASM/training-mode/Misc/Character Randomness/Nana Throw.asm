@@ -11,7 +11,7 @@ lwz r30, 0x4(r31) # internal char id
 cmpwi r30, 0xb
 bne- Exit # isn't Nana
 
-CharRng_FetchSetting r5, RandomItem
+CharRng_FetchSetting r5, Exit
 CharRng_LoadPlayerIdOfFighter r6, r31
 cmpwi r6, 0
 bne LoadCpuSetting
