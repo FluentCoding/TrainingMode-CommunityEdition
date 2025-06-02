@@ -4509,7 +4509,16 @@ void Record_LoadSavestate(Savestate *savestate) {
     
     int flags = 0;
     if (mirror) flags |= Savestate_Mirror;
+
+    LabData* event_data = event_vars->event_gobj->userdata;
+    u8 old_hmn_rng_setting = event_data->hmn_rng_setting;
+    u8 old_cpu_rng_setting = event_data->hmn_rng_setting;
+
     event_vars->Savestate_Load(savestate, flags);
+
+    // restore userdata for rng setting
+    event_data->hmn_rng_setting = old_hmn_rng_setting;
+    event_data->cpu_rng_setting = old_cpu_rng_setting;
 
     int plys[2] = {0, 1};
     int chances[2] = {
