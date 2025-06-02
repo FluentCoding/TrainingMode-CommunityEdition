@@ -856,7 +856,7 @@ static EventOption LabOptions_Main[OPTLAB_COUNT] = {
         .disable = 1,
         //.disable is set in Event_Init depending on fighters
         .name = "Character RNG Behavior",
-        .desc = "Change RNG behavior of Peach, Luigi, G&W and Icies.",
+        .desc = "Change RNG behavior of Peach, Luigi, GnW and Icies.",
     },
     {
         .kind = OPTKIND_MENU,
