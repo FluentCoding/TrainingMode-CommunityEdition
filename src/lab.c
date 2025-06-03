@@ -24,6 +24,7 @@ static DevText *stc_devtext;
 static u8 stc_hmn_controller;             // making this static so importing recording doesnt overwrite
 static u8 stc_cpu_controller;             // making this static so importing recording doesnt overwrite
 static u8 stc_null_controller;            // making this static so importing recording doesnt overwrite
+static LabPersistentData persistent_data;
 
 // Aitch: not really a better way to do this that I can think of.
 // Feel free to change if you find a way to implement playback takeover without a global.
@@ -285,11 +286,29 @@ void Lab_ChangePlayerLockPercent(GOBJ *menu_gobj, int value)
         hmn_locked_percent = fighter_data->dmg.percent;
 }
 
-void Lab_ChangeCharacterRng(GOBJ *menu_gobj, int value) {
-    LabData* event_data = event_vars->event_gobj->userdata;
-    event_data->hmn_rng_setting = LabOptions_CharacterRng[OPTCHARRNG_HMN_BEHAVIOR].val;
-    event_data->cpu_rng_setting = LabOptions_CharacterRng[OPTCHARRNG_CPU_BEHAVIOR].val;
+// CHARACTER RNG CHANGE CALLBACKS --------------------------------------------------------
+
+void Lab_ChangePeachCharacterRng(GOBJ *menu_gobj, int value) {
+    LabPersistentData* persistent_data = event_vars->persistent_data;
+    persistent_data->peach_item_rng = value;
 }
+
+void Lab_ChangeLuigiCharacterRng(GOBJ *menu_gobj, int value) {
+    LabPersistentData* persistent_data = event_vars->persistent_data;
+    persistent_data->luigi_misfire_rng = value;
+}
+
+void Lab_ChangeGnwCharacterRng(GOBJ *menu_gobj, int value) {
+    LabPersistentData* persistent_data = event_vars->persistent_data;
+    persistent_data->gnw_hammer_rng = value;
+}
+
+void Lab_ChangeNanaCharacterRng(GOBJ *menu_gobj, int value) {
+    LabPersistentData* persistent_data = event_vars->persistent_data;
+    persistent_data->nana_throw_rng = value;
+}
+
+// --------------------------------------------------------
 
 void Lab_StartMoveCPU(GOBJ *menu_gobj) {
     LabOptions_CPU[OPTCPU_SET_POS] = LabOptions_CPU_FinishMoveCPU;
@@ -4509,16 +4528,7 @@ void Record_LoadSavestate(Savestate *savestate) {
     
     int flags = 0;
     if (mirror) flags |= Savestate_Mirror;
-
-    LabData* event_data = event_vars->event_gobj->userdata;
-    u8 old_hmn_rng_setting = event_data->hmn_rng_setting;
-    u8 old_cpu_rng_setting = event_data->hmn_rng_setting;
-
     event_vars->Savestate_Load(savestate, flags);
-
-    // restore userdata for rng setting
-    event_data->hmn_rng_setting = old_hmn_rng_setting;
-    event_data->cpu_rng_setting = old_cpu_rng_setting;
 
     int plys[2] = {0, 1};
     int chances[2] = {
@@ -5972,41 +5982,22 @@ void Event_Init(GOBJ *gobj)
 
     // character rng options
     {
-        CharacterRngData* hmn_rng_data = character_rng_values[hmn_data->kind];
-        CharacterRngData* cpu_rng_data = character_rng_values[cpu_data->kind];
+        EventOption* hmn_rng_data = character_rng_options[hmn_data->kind];
+        EventOption* cpu_rng_data = character_rng_options[cpu_data->kind];
         if (hmn_rng_data != 0 || cpu_rng_data != 0) {
             LabOptions_Main[OPTLAB_CHAR_RNG].disable = 0;
-            EventOption* behavior_opt;
+            // LabMenu_CharacterRng.options = HSD_MemAlloc(sizeof(EventOption) * 2);
+            u8 current_option = 0;
             if (hmn_rng_data != 0) {
-                behavior_opt = &LabOptions_CharacterRng[OPTCHARRNG_HMN_BEHAVIOR];
-
-                behavior_opt->disable = 0;
-                behavior_opt->kind = OPTKIND_STRING;
-
-                const char* name_prefix = "HMN ";
-                char* name_buf = HSD_MemAlloc(sizeof(name_prefix) + hmn_rng_data->name_len);
-                strcpy(name_buf, name_prefix);
-                strcat(name_buf, hmn_rng_data->name);
-                behavior_opt->name = name_buf;
-
-                behavior_opt->values = hmn_rng_data->values;
-                behavior_opt->value_num = hmn_rng_data->values_len;
+                LabMenu_CharacterRng.options[current_option] = *hmn_rng_data;
+                current_option++;
             }
-            if (cpu_rng_data != 0) {
-                behavior_opt = &LabOptions_CharacterRng[OPTCHARRNG_CPU_BEHAVIOR];
-
-                behavior_opt->disable = 0;
-                behavior_opt->kind = OPTKIND_STRING;
-                
-                const char* name_prefix = "CPU ";
-                char* name_buf = HSD_MemAlloc(sizeof(name_prefix) + cpu_rng_data->name_len);
-                strcpy(name_buf, name_prefix);
-                strcat(name_buf, cpu_rng_data->name);
-                behavior_opt->name = name_buf;
-
-                behavior_opt->values = cpu_rng_data->values;
-                behavior_opt->value_num = cpu_rng_data->values_len;
+            // only if cpu is different from hmn
+            if (cpu_rng_data != 0 && hmn_rng_data != cpu_rng_data) {
+                LabMenu_CharacterRng.options[current_option] = *cpu_rng_data;
+                current_option++;
             }
+            LabMenu_CharacterRng.option_num = current_option;
         }
     }
 
@@ -6027,6 +6018,7 @@ void Event_Init(GOBJ *gobj)
     // theres got to be a better way to do this...
     event_vars = *event_vars_ptr;
 
+    event_vars->persistent_data = &persistent_data;
     event_vars->savestate_saved_while_mirrored = false;
     event_vars->loaded_mirrored = false;
 

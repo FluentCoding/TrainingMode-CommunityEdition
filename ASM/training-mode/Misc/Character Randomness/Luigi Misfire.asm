@@ -5,22 +5,11 @@
 # r3 = output, 0 is misfire, 1 is no misfire
 # r31 contains Fighter
 
-CharRng_FetchSetting r6, RandomMisfire
-CharRng_LoadPlayerIdOfFighter r7, r31
-cmpwi r7, 0
-bne LoadCpuSetting
+CharRng_FetchSetting r6, CharRng_Setting_Luigi_Misfire, RandomMisfire
 
-LoadHmnSetting:
-  CharRng_ExtractSetting r6, hmn
-  b SettingCheck
-
-LoadCpuSetting:
-  CharRng_ExtractSetting r6, cpu
-
-SettingCheck:
-  cmpwi r6, 0x1000
-  blt+ RandomMisfire
-  beq AlwaysMisfire
+cmpwi r6, 1
+blt+ RandomMisfire
+beq AlwaysMisfire
 
 NeverMisfire:
   li r3, 1

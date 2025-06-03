@@ -1300,52 +1300,49 @@ typedef struct CharacterRngData
     char** values;
 } CharacterRngData;
 
-static CharacterRngData LabValues_CharacterRngPeach = {
-    sizeof("DownB Pull"), "DownB Pull",
-    8, (char*[]){ "Default", "Regular Turnip", "Winky Turnip", "Dot Eyes Turnip", "Stitch Face Turnip", "Mr. Saturn", "Bob-omb", "Beam Sword" }
+static EventOption LabOption_CharacterRngPeach = {
+    .kind = OPTKIND_STRING,
+    .name = "Peach Pull",
+    .desc = "Change the Turnip/Item that peach pulls on DownB.",
+    .value_num = 8,
+    .values = (char*[]){ "Default", "Regular Turnip", "Winky Turnip", "Dot Eyes Turnip", "Stitch Face Turnip", "Mr. Saturn", "Bob-omb", "Beam Sword" },
+    .OnChange = Lab_ChangePeachCharacterRng,
 };
-static CharacterRngData LabValues_CharacterRngLuigi = {
-    sizeof("Misfire"), "Misfire",
-    3, (char*[]){ "Default", "Always misfire", "Never misfire" }
+static EventOption LabOption_CharacterRngLuigi = {
+    .kind = OPTKIND_STRING,
+    .name = "Luigi Misfire",
+    .desc = "Change the frequency of Luigi Misfires to always/never.",
+    .value_num = 3,
+    .values = (char*[]){ "Default", "Always misfire", "Never misfire" },
+    .OnChange = Lab_ChangeLuigiCharacterRng,
 };
-static CharacterRngData LabValues_CharacterRngGAW = {
-    sizeof("GnW Hammer"), "GnW Hammer",
-    10, (char*[]){ "Default", "1", "2", "3", "4", "5", "6", "7", "8", "9" }
+static EventOption LabOption_CharacterRngGnW = {
+    .kind = OPTKIND_STRING,
+    .name = "GnW Hammer",
+    .desc = "Change the number that Game and Watch pulls with SideB.",
+    .value_num = 10,
+    .values = (char*[]){ "Default", "1", "2", "3", "4", "5", "6", "7", "8", "9" },
+    .OnChange = Lab_ChangeGnwCharacterRng,
 };
-static CharacterRngData LabValues_CharacterRngIcies = {
-    sizeof("Nana Throw"), "Nana Throw",
-    5, (char*[]){ "Default", "Forward Throw", "Backward Throw", "Upthrow", "Downthrow" }
-};
-
-static EventOption LabOptions_CharacterRng[OPTCHARRNG_COUNT] = {
-    {
-        .kind = OPTKIND_MENU,
-        .disable = 1,
-        .name = "HMN",
-        .desc = "Sets HMN behavior.",
-        .OnChange = Lab_ChangeCharacterRng,
-        //.name, .values and .value_num are set in Event_Init depending on fighter
-    },
-    {
-        .kind = OPTKIND_MENU,
-        .disable = 1,
-        .name = "CPU",
-        .desc = "Sets CPU behavior.",
-        .OnChange = Lab_ChangeCharacterRng,
-        //.name, .values and .value_num are set in Event_Init depending on fighter
-    }
+static EventOption LabOption_CharacterRngIcies = {
+    .kind = OPTKIND_STRING,
+    .name = "Nana Throw",
+    .desc = "Change the throw move of Nanas AI.",
+    .value_num = 5,
+    .values = (char*[]){ "Default", "Forward Throw", "Backward Throw", "Upthrow", "Downthrow" },
+    .OnChange = Lab_ChangeNanaCharacterRng,
 };
 
 static EventMenu LabMenu_CharacterRng = {
     .name = "Character RNG Behavior",
-    .option_num = sizeof(LabOptions_CharacterRng) / sizeof(EventOption),
-    .options = &LabOptions_CharacterRng,
+    // .option_num = sizeof(LabOptions_CharacterRng) / sizeof(EventOption),
+    .options = (EventOption[2]){},
     .shortcuts = &Lab_ShortcutList,
 };
 
-// CHARACTER RNG VALUES TABLE --------------------------------------------------------
+// CHARACTER RNG OPTIONS TABLE --------------------------------------------------------
 
-static const CharacterRngData* character_rng_values[] = {
+static const EventOption* character_rng_options[] = {
     0,                              // FTKIND_MARIO
     0,                              // FTKIND_FOX
     0,                              // FTKIND_FALCON
@@ -1355,22 +1352,22 @@ static const CharacterRngData* character_rng_values[] = {
     0,                              // FTKIND_LINK
     0,                              // FTKIND_SHEIK
     0,                              // FTKIND_NESS
-    &LabValues_CharacterRngPeach,   // FTKIND_PEACH
-    &LabValues_CharacterRngIcies,   // FTKIND_POPO
-    &LabValues_CharacterRngIcies,   // FTKIND_NANA
+    &LabOption_CharacterRngPeach,   // FTKIND_PEACH
+    &LabOption_CharacterRngIcies,   // FTKIND_POPO
+    &LabOption_CharacterRngIcies,   // FTKIND_NANA
     0,                              // FTKIND_PIKACHU
     0,                              // FTKIND_SAMUS
     0,                              // FTKIND_YOSHI
     0,                              // FTKIND_JIGGLYPUFF
     0,                              // FTKIND_MEWTWO
-    &LabValues_CharacterRngLuigi,   // FTKIND_LUIGI
+    &LabOption_CharacterRngLuigi,   // FTKIND_LUIGI
     0,                              // FTKIND_MARTH
     0,                              // FTKIND_ZELDA
     0,                              // FTKIND_YOUNGLINK
     0,                              // FTKIND_DRMARIO
     0,                              // FTKIND_FALCO
     0,                              // FTKIND_PICHU
-    &LabValues_CharacterRngGAW,     // FTKIND_GAW
+    &LabOption_CharacterRngGnW,     // FTKIND_GAW
     0,                              // FTKIND_GANONDORF
     0,                              // FTKIND_ROY
     0,                              // FTKIND_MASTERHAND

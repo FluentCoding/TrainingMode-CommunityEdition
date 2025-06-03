@@ -5,23 +5,12 @@
 # r3 = 0-index number output
 # r31 contains Fighter
 
-CharRng_FetchSetting r6, SetHammer
-CharRng_LoadPlayerIdOfFighter r7, r31
-cmpwi r7, 0
-bne LoadCpuSetting
+CharRng_FetchSetting r6, CharRng_Setting_GnW_Hammer, SetHammer
 
-LoadHmnSetting:
-  CharRng_ExtractSetting r6, hmn
-  b DetermineHammer
-
-LoadCpuSetting:
-  CharRng_ExtractSetting r6, cpu
-
-DetermineHammer:
-  cmpwi r6, 0 # 0 = default setting
-  beq+ SetHammer
-  srwi r6, r6, 12 # shift 12 bits to the right, 0x00001000 > 0x00000001
-  subi r30, r6, 1 # 1-9 gotta be 0-indexed
+cmpwi r6, 0 # 0 = default setting
+beq+ SetHammer
+# srwi r6, r6, 12 # shift 12 bits to the right, 0x00001000 > 0x00000001
+subi r30, r6, 1 # 1-9 gotta be 0-indexed
 
 SetHammer:
   # original line

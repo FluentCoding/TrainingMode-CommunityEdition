@@ -1121,6 +1121,7 @@ static EventVars stc_event_vars = {
     .menu_assets = 0,
     .event_gobj = 0,
     .menu_gobj = 0,
+    .persistent_data = 0,
     .game_timer = 0,
     .hide_menu = 0,
     .Savestate_Save = Savestate_Save,

@@ -917,6 +917,7 @@
 
     .set EventVars_Ptr, 0x803d7054
     .set EventVars_EventGobj, (2 * 4)
+    .set EventVars_PersistentData, (4 * 4)
     .set EventVars_MessageDisplay, (8 * 4)
 
     # Message Display
