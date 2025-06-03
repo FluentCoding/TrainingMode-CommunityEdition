@@ -1335,7 +1335,6 @@ static EventOption LabOption_CharacterRngIcies = {
 
 static EventMenu LabMenu_CharacterRng = {
     .name = "Character RNG Behavior",
-    // .option_num = sizeof(LabOptions_CharacterRng) / sizeof(EventOption),
     .options = (EventOption[2]){},
     .shortcuts = &Lab_ShortcutList,
 };

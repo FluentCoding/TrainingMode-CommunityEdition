@@ -14,7 +14,6 @@ bne- Exit # isn't Nana
 CharRng_FetchSetting r5, CharRng_Setting_Nana_Throw, Exit
 cmpwi r5, 0 # 0 = default setting
 beq+ Exit
-# srwi r5, r5, 12 # shift 12 bits to the right, 0x00001000 > 0x00000001
 li r4, 0xda # 1 - fthrow
 add r4, r4, r5
 

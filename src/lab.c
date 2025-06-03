@@ -5986,7 +5986,6 @@ void Event_Init(GOBJ *gobj)
         EventOption* cpu_rng_data = character_rng_options[cpu_data->kind];
         if (hmn_rng_data != 0 || cpu_rng_data != 0) {
             LabOptions_Main[OPTLAB_CHAR_RNG].disable = 0;
-            // LabMenu_CharacterRng.options = HSD_MemAlloc(sizeof(EventOption) * 2);
             u8 current_option = 0;
             if (hmn_rng_data != 0) {
                 LabMenu_CharacterRng.options[current_option] = *hmn_rng_data;
